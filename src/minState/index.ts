@@ -87,9 +87,6 @@ function getStoreItem(identifier: string) {
 }
 
 function create<T>({name,value,reducer}:CreateType<T>) {
-	if (!isString(name)) {
-		throw new Error('Store name must be a string');
-	}
 	if ($$stores[name]) {
 		return
 	}
@@ -108,7 +105,6 @@ export function createStore<T>({name,value}:Omit<CreateType<T>, "reducer" >):[T,
 	if (!store){
 		store = create<T>({name,value})
 	}
-
 	const [state, setState] = useState(store.state);
 
 	useEffect(() => {
