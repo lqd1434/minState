@@ -3,16 +3,18 @@ import { useState, useEffect, Dispatch} from "react";
 const isFunction = (fn: any) => typeof fn === 'function';
 const isString = (str: any) => typeof str === 'string';
 
-const defaultReducer = (state: any, payload: any) => payload;
-
-interface StoresType {
-	name: string
-	store: Store
+interface CreateType<T> {
+	name:string
+	value:T
+	reducer?:(state: T, payload: T) => T;
 }
 
-interface SubscribersType {
-	name: string
-	store: Store
+const defaultReducer:CreateType<any>["reducer"] = (state: any, payload: any) => payload;
+
+
+export interface DispatchType<T> {
+	newValue: T
+	callback?: (value:T)=>void
 }
 
 // define global store
@@ -24,10 +26,10 @@ const $$subscribers: any = {};
  *
  * @class Store
  */
-class Store {
+class Store<T extends any> {
 	name: string
-	state: any
-	reducer: any
+	state: T
+	reducer?: any
 	dispatchers: any
 
 	constructor(name: string, state: any, reducer = defaultReducer) {
@@ -55,17 +57,19 @@ class Store {
 		}
 	}
 
-	dispatch(action: any, callback: (data: any) => void) {
+
+	dispatch({newValue,callback}:DispatchType<T>) {
 		const {name, state} = this;
-		this.state = this.reducer(state, action);
+		this.state = this.reducer(state, newValue);
 		this.dispatchers.forEach((dispatcher: (arg0: any) => any) => {
-			console.log(dispatcher)
 			dispatcher(this.state)
 		});
 		if ($$subscribers[name].length) {
-			$$subscribers[name].forEach((c: (arg0: any, arg1: any) => any) => c(state, action));
+			$$subscribers[name].forEach((c: (arg0: any, arg1: any) => any) => c(state, newValue));
 		}
-		if (typeof callback === 'function') callback(state)
+		if (callback&&typeof callback === 'function'){
+			 callback(state)
+		}
 	}
 }
 
@@ -74,76 +78,49 @@ class Store {
  * @param {*} identifier
  * @returns {Store}
  */
-function getStoreItem(identifier: any) {
-	const name = identifier instanceof Store ? identifier.name : identifier;
+function getStoreItem(identifier: string) {
+	const name = identifier;
 	if (!$$stores[name]) {
 		return null
 	}
 	return $$stores[name];
 }
 
-export function createStore(name: string, state = {}, reducer?: ((state: any, payload: any) => any) | undefined) {
+function create<T>({name,value,reducer}:CreateType<T>) {
 	if (!isString(name)) {
 		throw new Error('Store name must be a string');
 	}
 	if ($$stores[name]) {
-		throw new Error(`Store with name ${name} already exists`);
+		return
 	}
 
 	$$subscribers[name] = [];
-	const store = new Store(name, state, reducer);
+	const store = new Store<T>(name, value, reducer);
 
 	$$stores = Object.assign({}, $$stores, {[name]: store});
 	// console.log($$stores)
 	return store;
 }
 
-/**
- * Can only be called within React Components
- * @param {String|Store} identifier - The identifier for the find store
- * @returns {Array} the [state, setState] pair.
- */
-export function useStore<T>(identifier: any) {
-	let store = getStoreItem(identifier);
+
+export function createStore<T>({name,value}:Omit<CreateType<T>, "reducer" >):[T,(data:DispatchType<T>)=>void]{
+	let store = getStoreItem(name);
 	if (!store){
-		store = createStore(identifier,0)
+		store = create<T>({name,value})
 	}
-	const [state, set] = useState(store.state);
+
+	const [state, setState] = useState(store.state);
 
 	useEffect(() => {
-		if (!store.dispatchers.includes(set)) {
-			store.dispatchers.push(set);
+		if (!store.dispatchers.includes(setState)) {
+			store.dispatchers.push(setState);
 		}
 		//组件卸载时取消监听
 		return () => {
-			store.dispatchers = store.dispatchers.filter((setter: Dispatch<any>) => setter !== set)
+			store.dispatchers = store.dispatchers.filter((setter: Dispatch<any>) => setter !== setState)
 		}
 	}, [])
 
 	return [ state, store.dispatch ];
 }
 
-interface CreateProps {
-	identifier: string
-}
-
-export const create = (identifier: string,initState:any)=>{
-	let store = getStoreItem(identifier);
-	if (!store){
-		store = createStore(identifier,initState)
-	}
-
-	const [state, set] = useState(store.state);
-
-	useEffect(() => {
-		if (!store.dispatchers.includes(set)) {
-			store.dispatchers.push(set);
-		}
-		//组件卸载时取消监听
-		return () => {
-			store.dispatchers = store.dispatchers.filter((setter: Dispatch<any>) => setter !== set)
-		}
-	}, [])
-
-	return [ state, store.dispatch ];
-}

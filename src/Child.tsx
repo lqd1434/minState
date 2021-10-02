@@ -1,5 +1,4 @@
 import React from "react";
-import {useStore} from "./minState";
 import {useMyState} from "./state";
 
 const Child = () => {
@@ -11,7 +10,7 @@ const Child = () => {
 	return (
 			<div>
 				<h1>{count}</h1>
-				<button onClick={()=>setCount(8)}>按钮2</button>
+				<button onClick={()=>setCount({newValue:10})}>按钮2</button>
 			</div>
 	)
 }

@@ -1,5 +1,6 @@
-import {create} from "./minState";
+import {createStore, DispatchType} from "./minState";
 
-export const useMyState = () =>{
-	return (create('count',0))
+export const useMyState =():[number,(data:DispatchType<number>)=>void ]=>{
+
+	return createStore<number>({name:'count',value:0})
 }
