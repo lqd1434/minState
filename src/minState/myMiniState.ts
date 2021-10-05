@@ -22,7 +22,7 @@ export class UStore<T extends any> {
 	storeKey:string
 	state: T
 	listeners: Dispatch<React.SetStateAction<T>>[]
-	updateFunc:UpdateFuncType<T> = defaultUpdateFunc
+	updateFunc:UpdateFuncType<T>
 
 	constructor(storeKey:string,state:T,updateFunc: UpdateFuncType<T>) {
 		console.log(updateFunc)
