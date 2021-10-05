@@ -30,7 +30,7 @@ const $$subscribers: any = {};
  *
  * @class Store
  */
-class Store<T extends any> {
+class Store<T> {
 	name: string
 	state: T
 	reducer?: any
@@ -44,22 +44,22 @@ class Store<T extends any> {
 		this.dispatch = this.dispatch.bind(this)
 	}
 
-	subscribe(callback: any) {
-		if (!isFunction(callback)) {
-			throw new Error(
-					`the function named subscribe callback argument must be a function.`
-			);
-		}
-		const {name} = this
-		if ($$subscribers[name].includes(callback)) {
-			console.warn('This callback is already subscribed to this store.');
-			return;
-		}
-		$$subscribers[name].push(callback);
-		return () => {
-			$$subscribers[name] = $$subscribers[name].filter((item: any) => item !== callback)
-		}
-	}
+	// subscribe(callback: any) {
+	// 	if (!isFunction(callback)) {
+	// 		throw new Error(
+	// 				`the function named subscribe callback argument must be a function.`
+	// 		);
+	// 	}
+	// 	const {name} = this
+	// 	if ($$subscribers[name].includes(callback)) {
+	// 		console.warn('This callback is already subscribed to this store.');
+	// 		return;
+	// 	}
+	// 	$$subscribers[name].push(callback);
+	// 	return () => {
+	// 		$$subscribers[name] = $$subscribers[name].filter((item: any) => item !== callback)
+	// 	}
+	// }
 
 
 	dispatch({newValue,callback}:DispatchProps<T>) {
@@ -82,7 +82,7 @@ class Store<T extends any> {
  * @param {*} identifier
  * @returns {Store}
  */
-function getStoreItem(identifier: string) {
+function getStore(identifier: string) {
 	const name = identifier;
 	if (!$$stores[name]) {
 		return null
@@ -105,7 +105,7 @@ function create<T>({name,value,reducer}:CreateType<T>) {
 
 
 export function createStore<T>({name,value}:Omit<CreateType<T>, "reducer" >):[T,DispatchFuncType<T>]{
-	let store = getStoreItem(name);
+	let store = getStore(name);
 	if (!store){
 		store = create<T>({name,value})
 	}

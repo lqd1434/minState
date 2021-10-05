@@ -10,9 +10,7 @@ function App() {
   return (
     <div className="App">
       <h1>{count}</h1>
-      <h1>{music.name}</h1>
-      <h1>{music.singer}</h1>
-      <button onClick={()=>setMusic({newValue:{name:'勋章',singer:'鹿晗'}})}>按钮1</button>
+      <button onClick={()=>setCount(count+1)}>按钮1</button>
     </div>
   )
 }
