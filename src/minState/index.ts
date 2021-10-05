@@ -3,6 +3,10 @@ import { useState, useEffect, Dispatch} from "react";
 const isFunction = (fn: any) => typeof fn === 'function';
 const isString = (str: any) => typeof str === 'string';
 
+interface DispatchFuncType<T> {
+	(data:DispatchProps<T>):void
+}
+
 interface CreateType<T> {
 	name:string
 	value:T
@@ -12,7 +16,7 @@ interface CreateType<T> {
 const defaultReducer:CreateType<any>["reducer"] = (state: any, payload: any) => payload;
 
 
-export interface DispatchType<T> {
+export interface DispatchProps<T> {
 	newValue: T
 	callback?: (value:T)=>void
 }
@@ -58,7 +62,7 @@ class Store<T extends any> {
 	}
 
 
-	dispatch({newValue,callback}:DispatchType<T>) {
+	dispatch({newValue,callback}:DispatchProps<T>) {
 		const {name, state} = this;
 		this.state = this.reducer(state, newValue);
 		this.dispatchers.forEach((dispatcher: (arg0: any) => any) => {
@@ -100,7 +104,7 @@ function create<T>({name,value,reducer}:CreateType<T>) {
 }
 
 
-export function createStore<T>({name,value}:Omit<CreateType<T>, "reducer" >):[T,(data:DispatchType<T>)=>void]{
+export function createStore<T>({name,value}:Omit<CreateType<T>, "reducer" >):[T,DispatchFuncType<T>]{
 	let store = getStoreItem(name);
 	if (!store){
 		store = create<T>({name,value})

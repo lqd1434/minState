@@ -1,4 +1,4 @@
-import {createStore, DispatchType} from "./minState";
+import {createStore} from "./minState";
 
 export const useMyState =()=>{
 
