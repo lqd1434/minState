@@ -8,6 +8,9 @@ function defaultUpdateFunc<T>(value:T){
 	return value
 }
 
+/**
+ * 状态类
+ */
 export class UStore<T extends any> {
 	storeKey:string
 	state: T
@@ -22,16 +25,29 @@ export class UStore<T extends any> {
 		this.dispatch = this.dispatch.bind(this)
 	}
 
+	/**
+	 * 状态更新函数
+	 * @param value 更新值
+	 * @param callback 回调,可获得更新后的值
+	 */
 	dispatch(value:T,callback?:(data:any)=>void){
 		const {listeners} = this
 		this.state = this.updateFunc(value)
 		listeners.forEach((listener)=>{
 			listener(this.state)
 		})
+
+		if (callback){
+			callback(this.state)
+		}
 	}
 
 }
 
+/**
+ * 获取状态
+ * @param storeKey 状态命名空间
+ */
 function getStore<T>(storeKey: string) {
 	const name = storeKey;
 	if (!Store[name]) {
@@ -40,6 +56,12 @@ function getStore<T>(storeKey: string) {
 	return Store[name] as UStore<T>;
 }
 
+/**
+ * 创建一个新状态
+ * @param name 状态命名空间
+ * @param value 状态初始值
+ * @param reducer 状态更新方式
+ */
 function create<T>(name:string,value:T,reducer?:any):UStore<T>|null {
 	if (Store[name]) {
 		return null
@@ -50,7 +72,13 @@ function create<T>(name:string,value:T,reducer?:any):UStore<T>|null {
 	return store;
 }
 
-export function createStore<T>(name:string,value:T):[T,DispatchFuncType<T>]{
+
+/**
+ * 用于组件获取状态
+ * @param name 状态
+ * @param value 初始值
+ */
+export function useStore<T>(name:string,value:T):[T,DispatchFuncType<T>]{
 	let store = getStore<T>(name);
 	if (!store){
 		console.log(name,value)

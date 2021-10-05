@@ -1,15 +1,15 @@
 // import {createStore} from "./minState";
 
-import { createStore } from "./minState/myMiniState"
+import { useStore } from "./minState/myMiniState"
 
 export const useMyState =()=>{
 
-	return createStore<number>('count',0)
+	return useStore<number>('count',0)
 }
 
 export const useMusicState =()=>{
 
-	return createStore<Music>('music',{name:'',singer:''})
+	return useStore<Music>('music',{name:'',singer:''})
 }
 
 interface Music{
