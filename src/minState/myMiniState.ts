@@ -1,4 +1,4 @@
-import {Dispatch, useEffect, useState} from "react";
+import React, {Dispatch, useEffect, useState} from "react";
 import {DispatchFuncType, StoreType} from "./type";
 
 
@@ -11,7 +11,7 @@ function defaultUpdateFunc<T>(value:T){
 export class UStore<T extends any> {
 	storeKey:string
 	state: T
-	listeners: any[]
+	listeners: Dispatch<React.SetStateAction<T>>[]
 	updateFunc?:any
 
 	constructor(storeKey:string,state:T,updateFunc=defaultUpdateFunc) {
@@ -23,12 +23,11 @@ export class UStore<T extends any> {
 	}
 
 	dispatch(value:T,callback?:(data:any)=>void){
-		const {storeKey,listeners} = this
+		const {listeners} = this
 		this.state = this.updateFunc(value)
 		listeners.forEach((listener)=>{
 			listener(this.state)
 		})
-		console.log(Store)
 	}
 
 }
@@ -46,7 +45,6 @@ function create<T>(name:string,value:T,reducer?:any):UStore<T>|null {
 		return null
 	}
 	const store = new UStore<T>(name, value, reducer);
-	// Store = Object.assign({}, Store, {[name]: store});
 	Store[name] = store
 	console.log(Store)
 	return store;
@@ -59,15 +57,16 @@ export function createStore<T>(name:string,value:T):[T,DispatchFuncType<T>]{
 		store = create<T>(name,value)
 	}
 	store = store as UStore<T>
-	const [state, setState] = useState(store.state);
+	const [state, setState] = useState<T>(store.state);
 
 	useEffect(() => {
+		//添加状态订阅,用于组件共享状态
 		if (!store!.listeners.includes(setState)) {
 			store!.listeners.push(setState);
 		}
 		//组件卸载时取消监听
 		return () => {
-			store!.listeners = store!.listeners.filter((setter: Dispatch<any>) => setter !== setState)
+			store!.listeners = store!.listeners.filter((setter: Dispatch<React.SetStateAction<T>>) => setter !== setState)
 		}
 	}, [])
 
