@@ -4,9 +4,16 @@ import {DispatchFuncType, StoreType} from "./type";
 
 let Store:StoreType = {}
 
-function defaultUpdateFunc<T>(value:T){
+
+function defaultUpdateFunc<T extends any>({state,value}:UpdateFuncProps<T>):T{
 	return value
 }
+
+type UpdateFuncProps<T> = {
+	state: T,
+	value: T
+}
+type UpdateFuncType<T> = (props:UpdateFuncProps<T>)=>T
 
 /**
  * 状态类
@@ -15,9 +22,10 @@ export class UStore<T extends any> {
 	storeKey:string
 	state: T
 	listeners: Dispatch<React.SetStateAction<T>>[]
-	updateFunc?:any
+	updateFunc:UpdateFuncType<T> = defaultUpdateFunc
 
-	constructor(storeKey:string,state:T,updateFunc=defaultUpdateFunc) {
+	constructor(storeKey:string,state:T,updateFunc: UpdateFuncType<T>) {
+		console.log(updateFunc)
 		this.storeKey = storeKey
 		this.state = state
 		this.listeners = []
@@ -31,8 +39,8 @@ export class UStore<T extends any> {
 	 * @param callback 回调,可获得更新后的值
 	 */
 	dispatch(value:T,callback?:(data:any)=>void){
-		const {listeners} = this
-		this.state = this.updateFunc(value)
+		const {state,listeners} = this
+		this.state = this.updateFunc({state, value})
 		listeners.forEach((listener)=>{
 			listener(this.state)
 		})
@@ -57,12 +65,12 @@ function getStore<T>(storeKey: string) {
 }
 
 /**
- * 创建一个新状态
+ * 创建一个新状态(内部)
  * @param name 状态命名空间
  * @param value 状态初始值
  * @param reducer 状态更新方式
  */
-function create<T>(name:string,value:T,reducer?:any):UStore<T>|null {
+function create<T>(name:string,value:T,reducer:UpdateFuncType<T>):UStore<T>|null {
 	if (Store[name]) {
 		return null
 	}
@@ -77,12 +85,12 @@ function create<T>(name:string,value:T,reducer?:any):UStore<T>|null {
  * 用于组件获取状态
  * @param name 状态
  * @param value 初始值
+ * @param reducer 状态更新方式
  */
-export function useStore<T>(name:string,value:T):[T,DispatchFuncType<T>]{
+export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,DispatchFuncType<T>]{
 	let store = getStore<T>(name);
 	if (!store){
-		console.log(name,value)
-		store = create<T>(name,value)
+		store = create<T>(name,value, reducer?? defaultUpdateFunc)
 	}
 	store = store as UStore<T>
 	const [state, setState] = useState<T>(store.state);

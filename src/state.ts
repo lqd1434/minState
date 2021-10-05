@@ -4,7 +4,7 @@ import { useStore } from "./minState/myMiniState"
 
 export const useMyState =()=>{
 
-	return useStore<number>('count',0)
+	return useStore<number>('count',0,({state,value}) =>value+5 )
 }
 
 export const useMusicState =()=>{
