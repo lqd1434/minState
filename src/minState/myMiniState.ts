@@ -1,6 +1,6 @@
 import React, {Dispatch, useEffect, useState} from "react";
 import {DispatchFuncType, StoreType, UpdateFuncProps, UpdateFuncType} from "./type";
-import {JudgmentType} from "./utils/judgment";
+import {JudgmentType, TypeEnums} from "./utils/judgment";
 
 
 let Store:StoreType = {}
@@ -102,14 +102,36 @@ export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,D
 		}
 	}, [])
 
-	return [ state, store.dispatch ];
+	return [ state, store.dispatch];
 }
 
 
-export function creatStore<T>(creatState:(set:any)=>T) {
-	const state = creatState(1)
-	const keys = Object.keys(state)
+export function creatStore<T extends Object>(creatState:()=>any):[T,DispatchFuncType<T>] {
+	const stateObj = creatState()
+	const keys = Object.keys(stateObj)
+	let reducer:any = null
 	for (const key of keys) {
-		console.log(JudgmentType(state[key]));
+		if (JudgmentType(stateObj[key]) === TypeEnums.Func){
+			reducer = stateObj[key]
+		}
 	}
+	console.log(reducer)
+	let store = getStore<T>(keys[0]);
+	if (!store){
+		store = create<T>(keys[0],stateObj[keys[0]], reducer?? defaultUpdateFunc)
+	}
+	store = store as UStore<T>
+	const [state, setState] = useState<T>(store.state);
+
+	useEffect(() => {
+		//添加状态订阅,用于组件共享状态,实时更新
+		if (!store!.listeners.includes(setState)) {
+			store!.listeners.push(setState);
+		}
+		//组件卸载时取消监听
+		return () => {
+			store!.listeners = store!.listeners.filter((setter: Dispatch<React.SetStateAction<T>>) => setter !== setState)
+		}
+	}, [])
+	return [ state, store.dispatch];
 }
