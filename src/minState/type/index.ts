@@ -8,7 +8,8 @@ export interface StoreType{
 export interface DispatchFuncType<T> {
 	(value:T,callback?:(data:any)=>void):void
 }
-
-export interface UpdateFuncType<T> {
-	(state:T,value:T):T
+export type UpdateFuncProps<T> = {
+	state: T,
+	value: T
 }
+export type UpdateFuncType<T> = (props:UpdateFuncProps<T>)=>T

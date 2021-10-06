@@ -1,5 +1,6 @@
 import React, {Dispatch, useEffect, useState} from "react";
-import {DispatchFuncType, StoreType} from "./type";
+import {DispatchFuncType, StoreType, UpdateFuncProps, UpdateFuncType} from "./type";
+import {JudgmentType} from "./utils/judgment";
 
 
 let Store:StoreType = {}
@@ -9,11 +10,6 @@ function defaultUpdateFunc<T extends any>({state,value}:UpdateFuncProps<T>):T{
 	return value
 }
 
-type UpdateFuncProps<T> = {
-	state: T,
-	value: T
-}
-type UpdateFuncType<T> = (props:UpdateFuncProps<T>)=>T
 
 /**
  * 状态类
@@ -96,7 +92,7 @@ export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,D
 	const [state, setState] = useState<T>(store.state);
 
 	useEffect(() => {
-		//添加状态订阅,用于组件共享状态
+		//添加状态订阅,用于组件共享状态,实时更新
 		if (!store!.listeners.includes(setState)) {
 			store!.listeners.push(setState);
 		}
@@ -107,4 +103,13 @@ export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,D
 	}, [])
 
 	return [ state, store.dispatch ];
+}
+
+
+export function creatStore<T>(creatState:(set:any)=>T) {
+	const state = creatState(1)
+	const keys = Object.keys(state)
+	for (const key of keys) {
+		console.log(JudgmentType(state[key]));
+	}
 }
