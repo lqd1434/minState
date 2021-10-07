@@ -5,11 +5,9 @@ import {JudgmentType, TypeEnums} from "./utils/judgment";
 
 let Store:StoreType = {}
 
-
 function defaultUpdateFunc<T extends any>({state,value}:UpdateFuncProps<T>):T{
 	return value
 }
-
 
 /**
  * 状态类
@@ -115,7 +113,6 @@ export function creatStore<T extends Object>(creatState:()=>any):[T,DispatchFunc
 			reducer = stateObj[key]
 		}
 	}
-	console.log(reducer)
 	let store = getStore<T>(keys[0]);
 	if (!store){
 		store = create<T>(keys[0],stateObj[keys[0]], reducer?? defaultUpdateFunc)
