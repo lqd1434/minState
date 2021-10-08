@@ -1,19 +1,17 @@
 import React from "react";
-import {useMusicState, useMyState} from "./state";
+import {useMyState} from "./state";
 
 const Child = () => {
 
-	const [ count, setCount ] = useMyState()
-	// const [{name,singer}, setMusic ] = useMusicState()
-
+	const [ music, setMusic ] = useMyState()
 
 	return (
-			<div>
-				<h1>{count}</h1>
+			<div className="App">
+				<h1>{music.name}</h1>
+				<h1>{music.singer}</h1>
 				<h1>Child</h1>
-				{/*<h1>{name}</h1>*/}
-				{/*<h1>{singer}</h1>*/}
-				{/*<button onClick={()=>setCount({newValue:10})}>按钮2</button>*/}
+				<button onClick={()=>setMusic({name:'剑心5',
+					singer:'李易峰2'})}>按钮1</button>
 			</div>
 	)
 }

@@ -1,19 +1,15 @@
 // import {createStore} from "./minState";
 
-import {creatStore, useStore} from "./minState/myMiniState"
+import { useStore} from "./minState/myMiniState"
 
 export const useMyState =()=>{
 
-	return useStore<number>('count',0,({state,value}) =>value+5 )
+	return useStore<Music>('music',{
+		name:'剑心',
+		singer:'李易峰'
+	})
 }
 
-export const useMusicState =()=>{
-
-	return creatStore<string>(()=>({
-		music:'明天',
-		setMusic:({state, value})=>value
-	}))
-}
 
 interface Music{
 	name:string
