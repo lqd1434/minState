@@ -3,7 +3,7 @@ import {emitter} from "../EventEmiter";
 let store = {}
 
 
-export function test(initValue:string){
+export function test<T>(initValue:T){
 	console.log(initValue)
 	// sessionStorage.setItem(key)
 	return (...props)=>{

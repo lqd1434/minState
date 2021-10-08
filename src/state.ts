@@ -19,10 +19,10 @@ class Music{
 
 class StateClass{
 
-	@test('name1')
+	@test<string>('name1')
 	name: string | undefined
 
-	@test('setName1')
+	@test<Function>( function (value){})
 	setName:Function = function (value){}
 }
 
