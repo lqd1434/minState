@@ -101,3 +101,4 @@ export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,D
 
 	return [ state, store.dispatch];
 }
+

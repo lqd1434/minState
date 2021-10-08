@@ -11,7 +11,7 @@ export const useMyState =()=>{
 }
 
 
-interface Music{
-	name:string
-	singer:string
+class Music{
+	name: string | undefined
+	singer: string | undefined
 }

@@ -13,3 +13,7 @@ export type UpdateFuncProps<T> = {
 	value: T
 }
 export type UpdateFuncType<T> = (props:UpdateFuncProps<T>)=>T
+
+export type Test<T> = {
+	[K in keyof T]:T[K]
+}
