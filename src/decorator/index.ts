@@ -1,17 +1,17 @@
 import {emitter} from "../EventEmiter";
 
+let store = {}
 
-function test(target:Function) {
-	target.prototype.name = '8'
-	console.log(new Date().getMilliseconds())
 
-	console.log(Object.getOwnPropertyDescriptor(target.prototype, 'name'));
-	// return target.test = false
-}
-
-export function test2(...props){
-	console.log(props)
-	console.log(new Date().getMilliseconds(),'2')
+export function test(initValue:string){
+	console.log(initValue)
+	// sessionStorage.setItem(key)
+	return (...props)=>{
+		console.log(props[1])
+		store[props[1]] = initValue
+		console.log(store)
+		// sessionStorage.setItem(props[1],initValue)
+	}
 }
 
 // @test
