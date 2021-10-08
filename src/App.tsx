@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import './App.css'
-import { useMyState} from "./state";
+import {myStateClass, useMyState} from "./state";
 import {DEC} from "./decorator";
 
 
@@ -8,8 +8,7 @@ function App() {
   const [ music, setMusic ] = useMyState()
 
   useEffect(()=>{
-    const dec =new DEC()
-    console.log(dec)
+    console.log(myStateClass)
   })
 
   return (

@@ -9,15 +9,14 @@ function test(target:Function) {
 	// return target.test = false
 }
 
-function test2(...props){
+export function test2(...props){
 	console.log(props)
 	console.log(new Date().getMilliseconds(),'2')
 }
 
-// @ts-ignore
-@test
-export class DEC {
-	@test2
-	name:string = ''
-	age:number = 0
-}
+// @test
+// export class DEC {
+// 	@test2
+// 	name:string = ''
+// 	age:number = 0
+// }
