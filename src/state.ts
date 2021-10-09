@@ -17,13 +17,20 @@ class Music{
 	singer: string | undefined
 }
 
+
+const UpdateFuncs = {
+	setName: (state,value)=>{
+		console.log(value)
+	return value}
+}
+
+
 class StateClass{
 
 	@test<string>('name1')
 	name: string | undefined
-
-	@test<Function>( function (value){})
-	setName:Function = function (value){}
+	@test<Function>( UpdateFuncs.setName)
+	setName: Function | undefined
 }
 
 export const myStateClass = new StateClass()

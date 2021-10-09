@@ -12,8 +12,5 @@ export type UpdateFuncProps<T> = {
 	state: T,
 	value: T
 }
-export type UpdateFuncType<T> = (props:UpdateFuncProps<T>)=>T
+export type UpdateFuncType<T> = (state: T, value: T)=>T
 
-export type Test<T> = {
-	[K in keyof T]:T[K]
-}

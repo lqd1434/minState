@@ -1,22 +1,30 @@
 import {emitter} from "../EventEmiter";
+import {JudgmentType, TypeEnums} from "../minState/utils/judgment";
 
-let store = {}
+export let store:Object[] = []
 
 
 export function test<T>(initValue:T){
 	console.log(initValue)
-	// sessionStorage.setItem(key)
 	return (...props)=>{
-		console.log(props[1])
-		store[props[1]] = initValue
+		console.log(props)
+		const key = props[1]
+		let tmpObj:Object
+		if (JudgmentType(initValue) === TypeEnums.Func){
+			const updateFunc = (value)=>{
+				(initValue as unknown as Function)(value)
+				console.log('成功改写')
+				return value
+			}
+			tmpObj = {[key]:updateFunc}
+		} else {
+			tmpObj = {[key]:initValue}
+		}
+		store.push(tmpObj)
 		console.log(store)
-		// sessionStorage.setItem(props[1],initValue)
+		if (store.length===2){
+			console.log('成功')
+			// store.length = 0
+		}
 	}
 }
-
-// @test
-// export class DEC {
-// 	@test2
-// 	name:string = ''
-// 	age:number = 0
-// }
