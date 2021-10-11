@@ -23,8 +23,8 @@ class Person {
 	name:string|undefined
 
 	@Action()
-	setName(name:string,fun:any,cc:any){
-		this.name = name
+	setName(name:any,fun:any,cc:any){
+		console.log(name,'kkkkkkkkkkkkkk')
 	}
 }
 

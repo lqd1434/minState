@@ -7,9 +7,11 @@ import {observer} from "./minState/myMiniState";
 
 const App = observer(()=> {
   const [ music, setMusic ] = useMyState()
-  const [name,setName] = usePerson()
+  console.log(usePerson())
+  const [name,setName,fuc] = usePerson()
   useEffect(()=>{
     console.log(name)
+    fuc(1,2,3)
   })
 
 

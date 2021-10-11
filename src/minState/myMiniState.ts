@@ -157,8 +157,21 @@ export function State(initValue:any) {
 
 export function useInjection(className:Function ){
 	const value = Reflect.getMetadata(tempKey,tempObj)
-	console.log(className.prototype)
-	return useStore(tempKey,value)
+	const store = getStore(tempKey) as UStore<any>
+	const handle = {
+		get(target,propKey,proxy){
+			console.log(propKey,'get.....')
+			return Reflect.get(target,propKey,proxy)
+		}
+	}
 
-	// useStore(tempKey,)
+	const proxy = new Proxy<Object>(store.updateFunc,handle)
+	const keys = Object.keys(proxy)
+	const funcs:Object[] = []
+	keys.forEach((key)=>{
+		funcs.push(proxy[key])
+	})
+	console.log(funcs)
+	return [...useStore(tempKey,value),...funcs]
+
 }
