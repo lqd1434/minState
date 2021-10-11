@@ -21,9 +21,10 @@ class Music{
 class Person {
 	@State('jack')
 	name:string|undefined
+
 	@Action()
-	setName(){
-		this.name = 'hello'
+	setName(name:string,fun:any,cc:any){
+		this.name = name
 	}
 }
 

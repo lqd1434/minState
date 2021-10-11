@@ -2,6 +2,7 @@ import React, {Dispatch, useEffect, useState} from "react";
 import {DispatchFuncType, StoreType, UpdateFuncType} from "./type";
 import {JudgmentType, TypeEnums} from "./utils/judgment";
 import 'reflect-metadata'
+import {produce} from 'immer'
 
 
 let Store:StoreType = {}
@@ -34,7 +35,7 @@ export class UStore<T extends any> {
 	 */
 	dispatch(value:T,callback?:(data:any)=>void){
 		const {state,listeners} = this
-		// console.log(Object.prototype.toString.call(this.updateFunc))
+		console.log(JudgmentType(this.updateFunc))
 		if (JudgmentType(this.updateFunc) === TypeEnums.Func){
 			this.state = (this.updateFunc as Function)(state, value)
 		} else {
@@ -75,7 +76,6 @@ function create<T>(name:string,value:T,reducer:UpdateFuncType<T>):UStore<T>|null
 	}
 	const store = new UStore<T>(name, value, reducer);
 	Store[name] = store
-	// console.log(Store)
 	return store;
 }
 
@@ -92,6 +92,7 @@ export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,D
 		store = create<T>(name,value, reducer?? defaultUpdateFunc)
 	}
 	store = store as UStore<T>
+	console.log(store,'useStore')
 	const [state, setState] = useState<T>(store.state);
 
 	useEffect(() => {
@@ -105,6 +106,7 @@ export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,D
 		}
 	}, [])
 
+
 	return [ state, store.dispatch];
 }
 
@@ -115,7 +117,6 @@ export function observer(component:any){
 }
 
 
- let storedec = {}
 let tempKey:string = ''
 let tempObj = {}
 export function ObserveAble(target:{new ():any}){
@@ -125,9 +126,23 @@ export function ObserveAble(target:{new ():any}){
 
 export function Action() {
 
-	// console.log(value,'--keys2')
 	return function (target,propKey,dec){
+		// console.log(target[propKey])
+		const func = produce(dec.value,(draft)=>{})
+		let store = getStore(tempKey);
+		if (!store){
+			const value = Reflect.getMetadata(tempKey,tempObj)
+			store = create(tempKey,value, defaultUpdateFunc)
+		}
 
+		store!.updateFunc = {
+			[propKey]:dec.value
+		}
+		const regExp1 = /\((.+)\)/g
+		const regExp2 = /,/g
+		let res = dec.value.toString().match(regExp1)[0]
+		const argCount = res.match(regExp2)?.length +1
+		console.log(argCount)
 	}
 }
 
@@ -142,7 +157,7 @@ export function State(initValue:any) {
 
 export function useInjection(className:Function ){
 	const value = Reflect.getMetadata(tempKey,tempObj)
-	console.log(value)
+	console.log(className.prototype)
 	return useStore(tempKey,value)
 
 	// useStore(tempKey,)
