@@ -1,7 +1,6 @@
 // import {createStore} from "./minState";
 
-import { useStore} from "./minState/myMiniState"
-import {test} from "./decorator";
+import {Action, ObserveAble, State, useInjection, useStore} from "./minState/myMiniState"
 
 export const useMyState =()=>{
 
@@ -13,24 +12,21 @@ export const useMyState =()=>{
 
 
 class Music{
+
 	name: string | undefined
 	singer: string | undefined
 }
 
-
-const UpdateFuncs = {
-	setName: (state,value)=>{
-		console.log(value)
-	return value}
+@ObserveAble
+class Person {
+	@State('jack')
+	name:string|undefined
+	@Action()
+	setName(){
+		this.name = 'hello'
+	}
 }
 
-
-class StateClass{
-
-	@test<string>('name1')
-	name: string | undefined
-	@test<Function>( UpdateFuncs.setName)
-	setName: Function | undefined
+export const usePerson =()=>{
+	return useInjection(Person)
 }
-
-export const myStateClass = new StateClass()

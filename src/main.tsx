@@ -7,7 +7,6 @@ import Child from "./Child";
 ReactDOM.render(
   <React.StrictMode>
     <App />
-    <Child/>
   </React.StrictMode>,
   document.getElementById('root')
 )

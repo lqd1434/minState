@@ -1,7 +1,7 @@
 import React, {Dispatch, useEffect, useState} from "react";
-import {DispatchFuncType, StoreType, UpdateFuncProps, UpdateFuncType} from "./type";
+import {DispatchFuncType, StoreType, UpdateFuncType} from "./type";
 import {JudgmentType, TypeEnums} from "./utils/judgment";
-import {store} from "../decorator";
+import 'reflect-metadata'
 
 
 let Store:StoreType = {}
@@ -20,7 +20,6 @@ export class UStore<T extends any> {
 	updateFunc:UpdateFuncType<T>|{}
 
 	constructor(storeKey:string,state:T,updateFunc: UpdateFuncType<T>) {
-		console.log(updateFunc)
 		this.storeKey = storeKey
 		this.state = state
 		this.listeners = []
@@ -35,7 +34,7 @@ export class UStore<T extends any> {
 	 */
 	dispatch(value:T,callback?:(data:any)=>void){
 		const {state,listeners} = this
-		console.log(Object.prototype.toString.call(this.updateFunc))
+		// console.log(Object.prototype.toString.call(this.updateFunc))
 		if (JudgmentType(this.updateFunc) === TypeEnums.Func){
 			this.state = (this.updateFunc as Function)(state, value)
 		} else {
@@ -76,7 +75,7 @@ function create<T>(name:string,value:T,reducer:UpdateFuncType<T>):UStore<T>|null
 	}
 	const store = new UStore<T>(name, value, reducer);
 	Store[name] = store
-	console.log(Store)
+	// console.log(Store)
 	return store;
 }
 
@@ -109,56 +108,42 @@ export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,D
 	return [ state, store.dispatch];
 }
 
-// let tempStore:Object[] = []
-// export function StoreDec<T>(initValue:T) {
-// 	return (...props)=>{
-// 		let tmpObj:Object
-// 		const key = props[1]
-// 		if (JudgmentType(initValue) === TypeEnums.Func){
-// 			const updateFunc = (value)=>{
-// 				(initValue as unknown as Function)(value)
-// 				console.log('成功改写')
-// 				return value
-// 			}
-// 			tmpObj = {[key]:updateFunc}
-// 		} else {
-// 			tmpObj = {[key]:initValue}
-// 		}
-// 		tempStore.push(tmpObj)
-//
-// 		if (tempStore.length === 2){
-// 			const keys = tempStore.keys()
-// 			const name = keys[1]
-// 			const updateFuncKey = keys[2]
-// 			const initValue = tempStore[0][name]
-// 			const updateFunc = tempStore[1][updateFuncKey]
-//
-// 			const reducer = (state,value)=>{
-// 				setState(value)
-// 				return updateFunc(state,value)
-// 			}
-//
-// 			let store = getStore<T>(name);
-// 			if (!store){
-// 				store = create<T>(name,initValue, reducer)
-// 			}
-// 			store = store as UStore<T>
-// 			const [state, setState] = useState<T>(store.state);
-//
-// 			useEffect(() => {
-// 				//添加状态订阅,用于组件共享状态,实时更新
-// 				if (!store!.listeners.includes(setState)) {
-// 					store!.listeners.push(setState);
-// 				}
-// 				//组件卸载时取消监听
-// 				return () => {
-// 					store!.listeners = store!.listeners.filter((setter: Dispatch<React.SetStateAction<T>>) => setter !== setState)
-// 				}
-// 			}, [])
-//
-// 			// return [ state, store.dispatch];
-//
-// 		}
-// 	}
-// }
+export function observer(component:any){
 
+	console.log('调用了observer')
+	return component
+}
+
+
+ let storedec = {}
+let tempKey:string = ''
+let tempObj = {}
+export function ObserveAble(target:{new ():any}){
+	console.log(tempKey,'ObserveAble')
+
+}
+
+export function Action() {
+
+	// console.log(value,'--keys2')
+	return function (target,propKey,dec){
+
+	}
+}
+
+export function State(initValue:any) {
+	return function (target,propKey){
+		console.log(propKey,'State')
+		tempKey = propKey
+		Reflect.defineMetadata(propKey,initValue,target)
+		tempObj = target
+	}
+}
+
+export function useInjection(className:Function ){
+	const value = Reflect.getMetadata(tempKey,tempObj)
+	console.log(value)
+	return useStore(tempKey,value)
+
+	// useStore(tempKey,)
+}

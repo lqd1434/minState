@@ -1,10 +1,14 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {useMyState} from "./state";
 
-const Child = () => {
+const Child = (props:any) => {
 
 	const [ music, setMusic ] = useMyState()
 
+
+	useEffect(()=>{
+		console.log('Child')
+	},[])
 	return (
 			<div className="App">
 				<h1>{music.name}</h1>

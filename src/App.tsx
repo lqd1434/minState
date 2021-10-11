@@ -1,26 +1,26 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect} from 'react'
 import './App.css'
-import {myStateClass, useMyState} from "./state";
-import {store} from "./decorator";
+import {useMyState, usePerson} from "./state";
+import Child from "./Child";
+import {observer} from "./minState/myMiniState";
 
 
-function App() {
+const App = observer(()=> {
   const [ music, setMusic ] = useMyState()
-
+  const [name,setName] = usePerson()
   useEffect(()=>{
-    console.log(myStateClass)
-    console.log(myStateClass.name)
-    myStateClass.setName?.('88','99')
+    console.log(name)
   })
+
 
   return (
     <div className="App">
-      <h1>{myStateClass.name}</h1>
       <h1>{music.singer}</h1>
-      <button onClick={()=>setMusic({name:'剑心5',
-        singer:'李易峰2'})}>按钮1</button>
+      <h1>{name}</h1>
+      <button onClick={()=>setName('李易峰')}>按钮1</button>
+      <Child/>
     </div>
   )
-}
+})
 
 export default App
