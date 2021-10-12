@@ -2,7 +2,6 @@ import React, {Dispatch, useEffect, useState} from "react";
 import {DispatchFuncType, StoreType, UpdateFuncType} from "./type";
 import {JudgmentType, TypeEnums} from "./utils/judgment";
 import 'reflect-metadata'
-import {produce} from 'immer'
 
 
 let Store:StoreType = {}
@@ -123,71 +122,52 @@ export function ObserveAble(target:{new ():any}){
 	console.log(tempKey,'ObserveAble')
 
 }
+const STATE_KEY = 'state'
 
 export function Action() {
 
 	return function (target,propKey,desc){
 		const originFunc = desc.value
 		desc.value = function (...args){
-			const params = args.map((item)=>{
-				return JSON.stringify(item)
-			}).join()
-			console.log('params',params)
-			console.log('this',this)
-			const result = originFunc.apply(this,args)
-			console.log('result',result)
-			return result
+			// const params = args.map((item)=>{
+			// 	return JSON.stringify(item)
+			// }).join()
+			console.log('调用了'+propKey)
+			return originFunc.apply(this, args)
 		}
 		return desc
 	}
 }
-
-export function State():PropertyDecorator {
-		return function (target:Object, propKey:string|symbol) {
-			console.log(propKey,'propKey')
-			let original = target[propKey];
-			console.log('original',original)
-			console.log(target)
-			let _val: string = 'fack'
-			const getter = () => {
-				console.log('getter ------')
-				// @ts-ignore
-				console.log(this)
-				return _val
-			}
-			const setter = (newValue: any) => {
-				_val = newValue
-				console.log('setter ------', newValue)
-			}
-			Reflect.deleteProperty(target, propKey);
-			Reflect.defineProperty(target, propKey, {
-				get: getter,
-				set: setter,
-				enumerable: true,
-				configurable: true
-			})
-			// tempKey = propKey
-			// tempObj = target
+export function State(initValue:any) {
+	return function (target:Object, propKey:string) {
+		let store = getStore(propKey);
+		if (!store){
+			store = create(propKey,initValue,  defaultUpdateFunc)
 		}
+		tempObj = target
+		tempKey = propKey
+		Reflect.defineMetadata(propKey,initValue,target)
+	}
 }
 
 export function useInjection(className:Function ){
-	const value = Reflect.getMetadata(tempKey,tempObj)
-	const store = getStore(tempKey) as UStore<any>
-	const handle = {
-		get(target,propKey,proxy){
-			console.log(propKey,'get.....')
-			return Reflect.get(target,propKey,proxy)
+	const value = Reflect.getOwnMetadata(tempKey,tempObj)
+	let store = getStore(tempKey) as UStore<any>;
+	console.log(store,'store')
+	console.log('tempKey--⚠️',value)
+	// console.log(store,'useStore')
+	const [state, setState] = useState(store.state);
+
+	useEffect(() => {
+		//添加状态订阅,用于组件共享状态,实时更新
+		if (!store!.listeners.includes(setState)) {
+			store!.listeners.push(setState);
 		}
-	}
+		//组件卸载时取消监听
+		return () => {
+			store!.listeners = store!.listeners.filter((setter: Dispatch<React.SetStateAction<any>>) => setter !== setState)
+		}
+	}, [])
 
-	const proxy = new Proxy<Object>(store.updateFunc,handle)
-	const keys = Object.keys(proxy)
-	const funcs:Object[] = []
-	keys.forEach((key)=>{
-		funcs.push(proxy[key])
-	})
-	console.log(funcs)
-	return [...useStore(tempKey,value),...funcs]
-
+	return [ state, store.dispatch];
 }

@@ -1,16 +1,16 @@
 import React, {useEffect} from 'react'
 import './App.css'
-import {useMyState, person} from "./state";
+import {useMyState, person,usePerson} from "./state";
 import Child from "./Child";
 import {observer} from "./minState/myMiniState";
+// import './minState/test'
 
 
 const App = observer(()=> {
   const [ music, setMusic ] = useMyState()
+  usePerson()
   useEffect(()=>{
-    person.setName('jack',1)
-    console.log(person);
-    console.log(Object.getPrototypeOf(person));
+    person.setId(1)
   })
 
 

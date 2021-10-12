@@ -19,18 +19,20 @@ class Music{
 
 // @ObserveAble
 class Person {
-	@State()
-	name:string = 'jack'
+	@State(1)
+	id: number | undefined
+
 
 	@Action()
-	setName(name:any,fun:any){
-		console.log(name,'kkkkkkkkkkkkkk')
+	setId(value:number){
+		console.log(value,'setId')
 	}
 }
 export const person = new Person()
-console.log(person.name)
-person.name = 'bob'
+
 
 export const usePerson =()=>{
+	const value = useInjection(Person)
+	console.log(value)
 	return useInjection(Person)
 }
