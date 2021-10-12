@@ -1,18 +1,19 @@
 import React, {useEffect} from 'react'
 import './App.css'
-import {useMyState, person,usePerson} from "./state";
+import {usePerson} from "./state";
 import Child from "./Child";
-import {observer} from "./minState/myMiniState";
 
 
-const App = observer(()=> {
-  const [ music, setMusic ] = useMyState()
-  const [id,setId,...res] = usePerson()
-  console.log(res,'-------res')
+const App = ()=> {
+  const [id,setId,clearId] = usePerson()
 
   const handleClick = ()=>{
-    const value = res[0](6)
-    console.log(value,'handleClick')
+    setId(7)
+    setTimeout(()=>{
+      clearId()
+    },2000)
+    // const value = res[0](6)
+    // console.log(value,'handleClick')
   }
 
   return (
@@ -22,6 +23,6 @@ const App = observer(()=> {
       <Child/>
     </div>
   )
-})
+}
 
 export default App

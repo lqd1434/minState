@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {useMyState, usePerson} from "./state";
+import {usePerson} from "./state";
 
 const Child = (props:any) => {
 

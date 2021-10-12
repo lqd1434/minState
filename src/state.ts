@@ -1,23 +1,22 @@
 // import {createStore} from "./minState";
 
-import {Action, ObserveAble, State, useInjection, useStore} from "./minState/myMiniState"
+import {Action, State, useInjection} from "./minState/myMiniState"
 
-export const useMyState =()=>{
+// export const useMyState =()=>{
+//
+// 	return useStore<Music>('music',{
+// 		name:'剑心',
+// 		singer:'李易峰'
+// 	})
+// }
+//
+//
+// class Music{
+//
+// 	name: string | undefined
+// 	singer: string | undefined
+// }
 
-	return useStore<Music>('music',{
-		name:'剑心',
-		singer:'李易峰'
-	})
-}
-
-
-class Music{
-
-	name: string | undefined
-	singer: string | undefined
-}
-
-// @ObserveAble
 export class Person {
 	@State(1)
 	id: number | undefined
@@ -33,8 +32,6 @@ export class Person {
 		this.id = 0
 	}
 }
-export const person = new Person()
-
 
 export const usePerson =()=>{
 	// const value = useInjection(Person)
