@@ -3,22 +3,22 @@ import './App.css'
 import {useMyState, person,usePerson} from "./state";
 import Child from "./Child";
 import {observer} from "./minState/myMiniState";
-// import './minState/test'
 
 
 const App = observer(()=> {
   const [ music, setMusic ] = useMyState()
-  usePerson()
-  useEffect(()=>{
-    person.setId(1)
-  })
+  const [id,setId,...res] = usePerson()
+  console.log(res,'-------res')
 
+  const handleClick = ()=>{
+    const value = res[0](6)
+    console.log(value,'handleClick')
+  }
 
   return (
     <div className="App">
-      <h1>{music.singer}</h1>
-      {/*<h1>{name}</h1>*/}
-      <button onClick={()=>{}}>按钮1</button>
+      <h1>{id}</h1>
+      <button onClick={handleClick}>按钮1</button>
       <Child/>
     </div>
   )

@@ -1,20 +1,17 @@
 import React, {useEffect} from "react";
-import {useMyState} from "./state";
+import {useMyState, usePerson} from "./state";
 
 const Child = (props:any) => {
 
-	const [ music, setMusic ] = useMyState()
-
+	const [id,setId] = usePerson()
 
 	useEffect(()=>{
 	},[])
 	return (
 			<div className="App">
-				<h1>{music.name}</h1>
-				<h1>{music.singer}</h1>
+				<h1>{id}</h1>
 				<h1>Child</h1>
-				<button onClick={()=>setMusic({name:'剑心5',
-					singer:'李易峰2'})}>按钮1</button>
+				<button onClick={()=>setId(5)}>按钮1</button>
 			</div>
 	)
 }
