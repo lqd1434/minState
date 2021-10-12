@@ -17,16 +17,19 @@ class Music{
 	singer: string | undefined
 }
 
-@ObserveAble
+// @ObserveAble
 class Person {
-	@State('jack')
-	name:string|undefined
+	@State()
+	name:string = 'jack'
 
 	@Action()
-	setName(name:any,fun:any,cc:any){
+	setName(name:any,fun:any){
 		console.log(name,'kkkkkkkkkkkkkk')
 	}
 }
+export const person = new Person()
+console.log(person.name)
+person.name = 'bob'
 
 export const usePerson =()=>{
 	return useInjection(Person)

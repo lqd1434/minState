@@ -7,7 +7,6 @@ const Child = (props:any) => {
 
 
 	useEffect(()=>{
-		console.log('Child')
 	},[])
 	return (
 			<div className="App">

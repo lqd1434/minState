@@ -92,7 +92,7 @@ export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,D
 		store = create<T>(name,value, reducer?? defaultUpdateFunc)
 	}
 	store = store as UStore<T>
-	console.log(store,'useStore')
+	// console.log(store,'useStore')
 	const [state, setState] = useState<T>(store.state);
 
 	useEffect(() => {
@@ -112,7 +112,7 @@ export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,D
 
 export function observer(component:any){
 
-	console.log('调用了observer')
+	// console.log('调用了observer')
 	return component
 }
 
@@ -126,33 +126,49 @@ export function ObserveAble(target:{new ():any}){
 
 export function Action() {
 
-	return function (target,propKey,dec){
-		// console.log(target[propKey])
-		const func = produce(dec.value,(draft)=>{})
-		let store = getStore(tempKey);
-		if (!store){
-			const value = Reflect.getMetadata(tempKey,tempObj)
-			store = create(tempKey,value, defaultUpdateFunc)
+	return function (target,propKey,desc){
+		const originFunc = desc.value
+		desc.value = function (...args){
+			const params = args.map((item)=>{
+				return JSON.stringify(item)
+			}).join()
+			console.log('params',params)
+			console.log('this',this)
+			const result = originFunc.apply(this,args)
+			console.log('result',result)
+			return result
 		}
-
-		store!.updateFunc = {
-			[propKey]:dec.value
-		}
-		const regExp1 = /\((.+)\)/g
-		const regExp2 = /,/g
-		let res = dec.value.toString().match(regExp1)[0]
-		const argCount = res.match(regExp2)?.length +1
-		console.log(argCount)
+		return desc
 	}
 }
 
-export function State(initValue:any) {
-	return function (target,propKey){
-		console.log(propKey,'State')
-		tempKey = propKey
-		Reflect.defineMetadata(propKey,initValue,target)
-		tempObj = target
-	}
+export function State():PropertyDecorator {
+		return function (target:Object, propKey:string|symbol) {
+			console.log(propKey,'propKey')
+			let original = target[propKey];
+			console.log('original',original)
+			console.log(target)
+			let _val: string = 'fack'
+			const getter = () => {
+				console.log('getter ------')
+				// @ts-ignore
+				console.log(this)
+				return _val
+			}
+			const setter = (newValue: any) => {
+				_val = newValue
+				console.log('setter ------', newValue)
+			}
+			Reflect.deleteProperty(target, propKey);
+			Reflect.defineProperty(target, propKey, {
+				get: getter,
+				set: setter,
+				enumerable: true,
+				configurable: true
+			})
+			// tempKey = propKey
+			// tempObj = target
+		}
 }
 
 export function useInjection(className:Function ){

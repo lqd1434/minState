@@ -1,25 +1,24 @@
 import React, {useEffect} from 'react'
 import './App.css'
-import {useMyState, usePerson} from "./state";
+import {useMyState, person} from "./state";
 import Child from "./Child";
 import {observer} from "./minState/myMiniState";
 
 
 const App = observer(()=> {
   const [ music, setMusic ] = useMyState()
-  console.log(usePerson())
-  const [name,setName,fuc] = usePerson()
   useEffect(()=>{
-    console.log(name)
-    fuc(1,2,3)
+    person.setName('jack',1)
+    console.log(person);
+    console.log(Object.getPrototypeOf(person));
   })
 
 
   return (
     <div className="App">
       <h1>{music.singer}</h1>
-      <h1>{name}</h1>
-      <button onClick={()=>setName('李易峰')}>按钮1</button>
+      {/*<h1>{name}</h1>*/}
+      <button onClick={()=>{}}>按钮1</button>
       <Child/>
     </div>
   )
