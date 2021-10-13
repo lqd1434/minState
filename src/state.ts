@@ -32,21 +32,21 @@ class Person {
 	}
 }
 
-// class Music{
-//
-// 	@State('')
-// 	name:string|undefined
-//
-// 	@Action()
-// 	setName(value:string){
-// 		this.name = value
-// 	}
-// }
+class Music{
+
+	@State('')
+	MusicName:string|undefined
+
+	@Action()
+	setName(value:string){
+		this.MusicName = value
+	}
+}
 
 export const usePerson =()=>{
 	return useInjection<Person>(Person)
 }
 
-// export const useMusic =()=>{
-// 	return useInjection<Music>(Music)
-// }
+export const useMusic =()=>{
+	return useInjection<Music>(Music)
+}

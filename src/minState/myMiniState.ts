@@ -26,6 +26,7 @@ export class UStore<T extends any> {
 	 */
 	dispatch(value:T){
 		this.state = value
+		console.log(value)
 	}
 
 }
@@ -56,9 +57,6 @@ function create<T>(name:string,value:T):UStore<T>|null {
 	return store;
 }
 
-let tempKey:string = ''
-let tempObj = {}
-
 const ACTION_KEY = 'action'
 
 export function Action() {
@@ -87,30 +85,33 @@ export function Action() {
 export function State(initValue:any) {
 	return function (target:Object, propKey:string) {
 		let store = getStore(propKey);
+		const name = target.constructor.name
 		if (!store){
-			 create(propKey,initValue)
+			console.log('propKey',propKey)
+			 create(name,initValue)
 		}
-		tempObj = target
-		tempKey = propKey
+		Reflect.defineMetadata(name,propKey,target)
 	}
 }
 
 export function useInjection<T extends Object>(Class:any ):T{
-	console.log(tempKey)
-	console.log(tempObj)
+	const className = (Class as Function).prototype.constructor.name
 	const [, setState] = useState({});
-	let store = getStore(tempKey) as UStore<any>;
-	const res = {[tempKey]:store.state}
+	const stateKey = Reflect.getMetadata(className,Class.prototype) as string
+	let store = getStore(className) as UStore<any>;
+	const res = {[stateKey]:store.state}
 	const instance = new Class() as T
-	const keys = Reflect.getMetadata(ACTION_KEY,tempObj) as Array<string>
+	const keys = Reflect.getMetadata(ACTION_KEY,Class.prototype) as Array<string>
 
 	keys.forEach((key)=>{
 		Object.assign(res,{[key]:instance[key].bind(instance)})
 	})
+	console.log(Store)
 
 	useLayoutEffect(() => {
 		emitter.on<any>('action',(data)=>{
-			store.dispatch(data[tempKey])
+			console.log(data)
+			store.dispatch(data[stateKey])
 			setState({})
 		})
 
