@@ -5,12 +5,12 @@ import Child from "./Child";
 
 
 const App = ()=> {
-  const [id,setId,clearId] = usePerson()
+  const {id,setId,clear} = usePerson()
 
   const handleClick = ()=>{
     setId(7)
     setTimeout(()=>{
-      clearId()
+      clear()
     },2000)
     // const value = res[0](6)
     // console.log(value,'handleClick')

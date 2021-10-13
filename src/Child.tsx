@@ -3,7 +3,7 @@ import {usePerson} from "./state";
 
 const Child = (props:any) => {
 
-	const [id,setId] = usePerson()
+	const {id,setId,clear} = usePerson()
 
 	useEffect(()=>{
 	},[])

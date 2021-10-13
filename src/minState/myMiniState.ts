@@ -105,16 +105,19 @@ export function State(initValue:any) {
 	}
 }
 
-export function useInjection<T extends {}>(Class:any ){
-	const person = new Class() as any
+export function useInjection<T extends Object>(Class:any ):T{
+	const instance = new Class() as T
 	const actionsMap = Reflect.getMetadata(ACTION_KEY,tempObj) as Map<string,any>
 	const keys = [...actionsMap.keys()]
-	const actions = keys.map(key=>{
-		return person[key].bind(person)
-	})
+
 	let store = getStore(tempKey) as UStore<any>;
 	console.log(store,'store')
-
+	const res = {
+		[tempKey]:store.state,
+	}
+	keys.forEach((key)=>{
+		Object.assign(res,{[key]:instance[key].bind(instance)})
+	})
 	const [, setState] = useState({});
 
 	useEffect(() => {
@@ -133,5 +136,6 @@ export function useInjection<T extends {}>(Class:any ){
 		}
 	}, [])
 
-	return [ store.state,...actions];
+
+	return res as T;
 }
