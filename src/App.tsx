@@ -5,7 +5,7 @@ import {useMusic} from "./devState";
 
 
 const App = ()=> {
-  const {musicName,singer,setName,setSinger} = useMusic()
+  const {musicName,setName,singer,setSinger} = useMusic()
 
   const handleClick = ()=>{
     setName('hello')

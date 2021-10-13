@@ -3,7 +3,7 @@ import {useMusic} from "./devState";
 
 const Child = (props:any) => {
 
-	const {musicName,singer,setName,setSinger} = useMusic()
+	const {musicName,setName} = useMusic()
 
 
 	useEffect(()=>{

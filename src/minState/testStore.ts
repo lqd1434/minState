@@ -2,6 +2,7 @@ import { useLayoutEffect, useState} from "react";
 import {StoreType} from "./type";
 import 'reflect-metadata'
 import {emitter} from "../EventEmiter";
+import {JudgmentType, TypeEnums} from "./utils/judgment";
 
 /**
  * 存储状态的大对象
@@ -30,7 +31,6 @@ export class UStore<T extends any> {
 
 	/**
 	 * 状态更新函数
-	 * @param key
 	 * @param value 更新值
 	 */
 	dispatch(value:T){
@@ -118,14 +118,13 @@ export function State<T>(initValue:T) {
 		const name = target.constructor.name
 
 		const tempState = {[propKey]:initValue}
-		const states = Reflect.getMetadata(`${name}:test`,target) as Map<string,any>
+		const states = Reflect.getMetadata(`${name}:state`,target) as Map<string,any>
 		if (states){
 			Object.assign(states,tempState)
-			Reflect.defineMetadata(`${name}:test`,states,target)
+			Reflect.defineMetadata(`${name}:state`,states,target)
 		} else {
-			Reflect.defineMetadata(`${name}:test`,tempState,target)
+			Reflect.defineMetadata(`${name}:state`,tempState,target)
 		}
-		Reflect.defineMetadata(`${name}:state`,propKey,target)
 	}
 }
 
@@ -136,29 +135,33 @@ export function State<T>(initValue:T) {
 export function useInjection<T extends Object>(Class:any ):T{
 	const className = (Class as Function).prototype.constructor.name
 	const [, setState] = useState({});
-	const stateKey = Reflect.getMetadata(`${className}:state`,Class.prototype) as string
-	// let store = getStore(className) as UStore<any>;
-	const states = Reflect.getMetadata(`${className}:test`,Class.prototype)
-
-	let store = getStore(className);
-	if (!store){
-		store = create(className,states)
-	}
-	store = store as UStore<any>
 	const res = {}
 	const instance = new Class() as T
-	const keys = Reflect.getMetadata(`${className}:action`,Class.prototype) as Array<string>
-	console.log(Store)
-	console.log(states)
+	const states = Reflect.getMetadata(`${className}:state`,Class.prototype)
+	const actionKeys = Reflect.getMetadata(`${className}:action`,Class.prototype) as Array<string>
+	const stateKeys = Object.keys(states)
+	let store = getStore(className);
 
-	Object.assign(res, store.state)
-	keys.forEach((key)=>{
+	if (!store){
+		if (stateKeys.length>1){
+			store = create(className,states)
+		} else {
+			store = create(className,states[stateKeys[0]])
+		}
+	}
+	store = store as UStore<any>
+
+	if (stateKeys.length>1){
+		Object.assign(res, store.state)
+	} else {
+		Object.assign(res,{[stateKeys[0]]:store?.state})
+	}
+
+	actionKeys.forEach((key)=>{
 		Object.assign(res,{[key]:instance[key].bind(instance)})
 	})
-	console.log(res)
 	useLayoutEffect(() => {
 		emitter.on<EmitterProps>(className,(data)=>{
-			console.log(data)
 			const {changeKeys,stateMap,multiple} = data
 			if (multiple){
 				store?.multipleDispatch(changeKeys,stateMap)
