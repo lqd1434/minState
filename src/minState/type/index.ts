@@ -1,5 +1,5 @@
-import {UStore} from "../myMiniState";
-import {DispatchProps} from "../index";
+import {UStore} from "../descStore";
+import {DispatchProps} from "../utils/origin";
 
 export interface StoreType{
 	[key:string]:any

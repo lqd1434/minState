@@ -1,21 +1,5 @@
-// import {createStore} from "./minState";
+import {Action, State, useInjection} from "./minState/descStore"
 
-import {Action, State, useInjection} from "./minState/myMiniState"
-
-// export const useMyState =()=>{
-//
-// 	return useStore<Music>('music',{
-// 		name:'剑心',
-// 		singer:'李易峰'
-// 	})
-// }
-//
-//
-// class Music{
-//
-// 	name: string | undefined
-// 	singer: string | undefined
-// }
 
 class Person {
 	@State(1)
@@ -34,7 +18,7 @@ class Person {
 
 class Music{
 
-	@State('')
+	@State<string>('')
 	MusicName:string|undefined
 
 	@Action()

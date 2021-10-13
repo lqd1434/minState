@@ -92,10 +92,10 @@ export function Action() {
  * @param initValue 初始值
  * @constructor
  */
-export function State(initValue:any) {
+export function State<T>(initValue:T) {
 	return function (target:Object, propKey:string) {
-		let store = getStore(propKey);
 		const name = target.constructor.name
+		let store = getStore(name);
 		if (!store){
 			 create(name,initValue)
 		}
@@ -115,12 +115,12 @@ export function useInjection<T extends Object>(Class:any ):T{
 	const res = {[stateKey]:store.state}
 	const instance = new Class() as T
 	const keys = Reflect.getMetadata(`${className}:action`,Class.prototype) as Array<string>
-
+	console.log(Store)
 	keys.forEach((key)=>{
 		Object.assign(res,{[key]:instance[key].bind(instance)})
 	})
 	useLayoutEffect(() => {
-		emitter.on<any>(className,(data)=>{
+		emitter.on<T>(className,(data)=>{
 			store.dispatch(data[stateKey])
 			setState({})
 		})
