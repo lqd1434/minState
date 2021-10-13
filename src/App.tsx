@@ -1,26 +1,22 @@
 import React from 'react'
 import './App.css'
-import {useMusic, usePerson} from "./state";
 import Child from "./Child";
+import {useMusic} from "./devState";
 
 
 const App = ()=> {
-  const {id,setId,clear} = usePerson()
-  const {MusicName,setName} = useMusic()
+  const {musicName,singer,setName,setSinger} = useMusic()
 
   const handleClick = ()=>{
-    setId(7)
-    setTimeout(()=>{
-      clear()
-    },2000)
+    setName('hello')
   }
 
   return (
     <div className="App">
-      <h1>{id}</h1>
-      <h1>{MusicName}</h1>
+      <h1>{musicName}</h1>
+      <h1>{singer}</h1>
       <button onClick={handleClick}>按钮1</button>
-      <button onClick={()=>setName('多想你')}>按钮2</button>
+      <button onClick={()=>setSinger('多想你')}>按钮2</button>
       <Child/>
     </div>
   )
