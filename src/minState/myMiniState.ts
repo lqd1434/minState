@@ -65,8 +65,9 @@ export function Action() {
 		const originFunc = desc.value
 		//修改
 		desc.value = function (...args){
+			const name = target.constructor.name
 			const result = originFunc.apply(this, args)
-			emitter.emit('action', this)
+			emitter.emit(name, this)
 			return result
 		}
 		//储存
@@ -109,7 +110,7 @@ export function useInjection<T extends Object>(Class:any ):T{
 	console.log(Store)
 
 	useLayoutEffect(() => {
-		emitter.on<any>('action',(data)=>{
+		emitter.on<any>(className,(data)=>{
 			console.log(data)
 			store.dispatch(data[stateKey])
 			setState({})
