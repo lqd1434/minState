@@ -17,10 +17,9 @@ import {Action, State, useInjection} from "./minState/myMiniState"
 // 	singer: string | undefined
 // }
 
-export class Person {
+class Person {
 	@State(1)
 	id: number | undefined
-
 
 	@Action()
 	setId(value:number){
@@ -33,8 +32,21 @@ export class Person {
 	}
 }
 
+// class Music{
+//
+// 	@State('')
+// 	name:string|undefined
+//
+// 	@Action()
+// 	setName(value:string){
+// 		this.name = value
+// 	}
+// }
+
 export const usePerson =()=>{
-	// const value = useInjection(Person)
-	// console.log(value)
 	return useInjection<Person>(Person)
 }
+
+// export const useMusic =()=>{
+// 	return useInjection<Music>(Music)
+// }
