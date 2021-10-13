@@ -1,9 +1,11 @@
-import React, {Dispatch, useEffect, useLayoutEffect, useState} from "react";
+import { useLayoutEffect, useState} from "react";
 import {StoreType} from "./type";
 import 'reflect-metadata'
 import {emitter} from "../EventEmiter";
 
-
+/**
+ * 存储状态的大对象
+ */
 let Store:StoreType = {}
 
 
@@ -57,7 +59,10 @@ function create<T>(name:string,value:T):UStore<T>|null {
 	return store;
 }
 
-
+/**
+ * 更新函数装饰器,只有通过更新函数才能触发状态更新
+ * @constructor
+ */
 export function Action() {
 
 	return function (target,propKey,desc){
@@ -82,6 +87,11 @@ export function Action() {
 	}
 }
 
+/**
+ * 状态值装饰器
+ * @param initValue 初始值
+ * @constructor
+ */
 export function State(initValue:any) {
 	return function (target:Object, propKey:string) {
 		let store = getStore(propKey);
@@ -93,6 +103,10 @@ export function State(initValue:any) {
 	}
 }
 
+/**
+ * 返回原对象的响应式包装,调用action函数触发状态更新
+ * @param Class
+ */
 export function useInjection<T extends Object>(Class:any ):T{
 	const className = (Class as Function).prototype.constructor.name
 	const [, setState] = useState({});
