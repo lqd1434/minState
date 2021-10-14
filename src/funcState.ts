@@ -13,9 +13,29 @@ export const usePerson =create<Person>((set)=>{
 	}
 })
 
+export const useMusic=create<Music>((set)=>{
+	return {
+		musicName:'hello world',
+		singer:'jack',
+		setMusicName: (musicName:string)=> {
+			set({musicName:'喂不饱'})
+		},
+		setSinger:(singer:string)=>{
+			set({singer:'bob'})
+		}
+	}
+})
+
 interface Person{
 	name:string
 	age:number
 	setName:(name:string)=>void
 	setAge:(age:number)=>void
+}
+
+interface Music{
+	musicName:string
+	singer:string
+	setMusicName:(musicName:string)=>void
+	setSinger:(singer:string)=>void
 }
