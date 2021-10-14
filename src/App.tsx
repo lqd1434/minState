@@ -5,16 +5,17 @@ import {usePerson} from "./funcState";
 
 
 const App = ()=> {
-  const [state,action] = usePerson()
-  console.log(state,'App')
+  const {name,setName} = usePerson((state => state))
+  console.log(name,'App')
 
   const handleClick = ()=>{
-    // (action as any).setName('hello')
+      setName('hello')
   }
 
   return (
     <div className="App">
       <h1>App</h1>
+      <h1>{name}</h1>
       <button onClick={handleClick}>按钮1</button>
       <Child/>
     </div>
