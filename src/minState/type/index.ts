@@ -14,3 +14,8 @@ export type UpdateFuncProps<T> = {
 }
 export type UpdateFuncType<T> = (state: T, value: T)=>T
 
+export interface CreateType {
+	state:Object
+	action:Object
+}
+

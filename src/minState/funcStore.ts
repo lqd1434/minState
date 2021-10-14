@@ -1,6 +1,7 @@
 import React, {Dispatch, useEffect, useState} from "react";
-import {DispatchFuncType, StoreType, UpdateFuncType} from "./type";
+import {CreateType, DispatchFuncType, StoreType, UpdateFuncType} from "./type";
 import 'reflect-metadata'
+import {JudgmentType, TypeEnums} from "./utils/judgment";
 
 
 let Store:StoreType = {}
@@ -16,16 +17,12 @@ export class UStore<T extends any> {
 	storeKey:string
 	state: T
 	listeners: Dispatch<React.SetStateAction<T>>[]
-	updateFunc:UpdateFuncType<T>
-	actions:Map<string,any>
 
-	constructor(storeKey:string,state:T,updateFunc: UpdateFuncType<T>) {
+	constructor(storeKey:string,state:T) {
 		this.storeKey = storeKey
 		this.state = state
 		this.listeners = []
-		this.updateFunc = updateFunc
 		this.dispatch = this.dispatch.bind(this)
-		this.actions = new Map<string, any>()
 	}
 
 	/**
@@ -58,45 +55,76 @@ function getStore<T>(storeKey: string) {
  * 创建一个新状态(内部)
  * @param name 状态命名空间
  * @param value 状态初始值
- * @param reducer 状态更新方式
  */
-function create<T>(name:string,value:T,reducer:UpdateFuncType<T>):UStore<T>|null {
+function _create<T>(name:string,value:T):UStore<T>|null {
 	if (Store[name]) {
 		return null
 	}
-	const store = new UStore<T>(name, value, reducer);
+	const store = new UStore<T>(name, value);
 	Store[name] = store
 	return store;
 }
 
 
-/**
- * 用于组件获取状态
- * @param name 状态
- * @param value 初始值
- * @param reducer 状态更新方式
- */
-export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,DispatchFuncType<T>]{
-	let store = getStore<T>(name);
+// /**
+//  * 用于组件获取状态
+//  * @param createState
+//  */
+// export function useStore<T>(name:string,value:T,reducer?:UpdateFuncType<T>):[T,DispatchFuncType<T>]{
+// 	let store = getStore<T>(name);
+// 	if (!store){
+// 		store = _create<T>(name,value, reducer?? defaultUpdateFunc)
+// 	}
+// 	store = store as UStore<T>
+// 	// console.log(store,'useStore')
+// 	const [state, setState] = useState<T>(store.state);
+//
+// 	useEffect(() => {
+// 		//添加状态订阅,用于组件共享状态,实时更新
+// 		if (!store!.listeners.includes(setState)) {
+// 			store!.listeners.push(setState);
+// 		}
+// 		//组件卸载时取消监听
+// 		return () => {
+// 			store!.listeners = store!.listeners.filter((setter: Dispatch<React.SetStateAction<T>>) => setter !== setState)
+// 		}
+// 	}, [])
+//
+//
+// 	return [ state, store.dispatch];
+// }
+
+export function create<T extends Object>(createState:T) {
+	const keys = Object.keys(createState)
+	const uniqueName = keys.join('')
+	const state = {}
+	keys.forEach((key)=>{
+		if (!(JudgmentType(createState[key]) === TypeEnums.Func)){
+			Object.assign(state,{[key]:createState[key]})
+		}
+	})
+	console.log(state)
+	let store = getStore<Object>(uniqueName)
 	if (!store){
-		store = create<T>(name,value, reducer?? defaultUpdateFunc)
+		store = _create<Object>(uniqueName,state)
 	}
-	store = store as UStore<T>
-	// console.log(store,'useStore')
-	const [state, setState] = useState<T>(store.state);
+	store = store as UStore<any>
+	//
+	// actionKeys.forEach((key)=>{
+	// 	const originFunc = action[key]
+	// 	action[key] = function (...args){
+	// 		originFunc.apply({}, [state,...args])
+	// 		_update({})
+	// 	}
+	// })
+	//
+	// const [_state, setState] = useState<any>(store.state);
+	// const [, _update] = useState<any>({});
+	//
+	// useEffect(()=>{
+	//
+	// },[])
 
-	useEffect(() => {
-		//添加状态订阅,用于组件共享状态,实时更新
-		if (!store!.listeners.includes(setState)) {
-			store!.listeners.push(setState);
-		}
-		//组件卸载时取消监听
-		return () => {
-			store!.listeners = store!.listeners.filter((setter: Dispatch<React.SetStateAction<T>>) => setter !== setState)
-		}
-	}, [])
-
-
-	return [ state, store.dispatch];
+	return [state,state]
 }
 

@@ -1,22 +1,21 @@
 import React from 'react'
 import './App.css'
 import Child from "./Child";
-import {useMusic} from "./state";
+import {usePerson} from "./funcState";
 
 
 const App = ()=> {
-  const {musicName,setName} = useMusic()
+  const [state,action] = usePerson()
+  console.log(state,'App')
 
   const handleClick = ()=>{
-    setName('hello')
+    // (action as any).setName('hello')
   }
 
   return (
     <div className="App">
-      <h1>{musicName}</h1>
-      {/*<h1>{singer}</h1>*/}
+      <h1>App</h1>
       <button onClick={handleClick}>按钮1</button>
-      {/*<button onClick={()=>setSinger('多想你')}>按钮2</button>*/}
       <Child/>
     </div>
   )
