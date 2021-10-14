@@ -8,6 +8,11 @@ import {emitter} from "../EventEmiter";
  */
 let Store:StoreType = {}
 
+interface EmitterProps{
+	changeKeys:string[]
+	stateMap:Map<string,any>
+}
+
 
 /**
  * 状态类
@@ -23,12 +28,14 @@ export class UStore<T extends any> {
 	}
 
 	/**
-	 * 状态更新函数
-	 * @param value 更新值
+	 * 更新状态
+	 * @param keys
+	 * @param stateMap
 	 */
-	dispatch(value:T){
-		this.state = value
-		console.log(value)
+	dispatch(keys:string[],stateMap:Map<string,any>){
+		keys.forEach((key)=>{
+			this.state[key] = stateMap.get(key)
+		})
 	}
 
 }
@@ -70,17 +77,26 @@ export function Action() {
 		const name = target.constructor.name
 		//修改
 		desc.value = function (...args){
+			const keys = Object.keys(this)
 			const result = originFunc.apply(this, args)
-			emitter.emit(name, this)
+			const changeKeys:string[] = []
+			const stateMap = new Map<string,any>()
+			keys.forEach((key)=>{
+				if (this[key]){
+					changeKeys.push(key)
+					stateMap.set(key,this[key])
+				}
+			})
+			emitter.emit<EmitterProps>(name, {changeKeys:changeKeys,stateMap:stateMap})
 			return result
 		}
 		//储存
 		const actions = Reflect.getMetadata(`${name}:action`,target) as Array<string>
 		if (actions){
-				Reflect.defineMetadata(`${name}:action`,[...actions,propKey],target)
-			} else {
-				Reflect.defineMetadata(`${name}:action`,[propKey],target)
-			}
+			Reflect.defineMetadata(`${name}:action`,[...actions,propKey],target)
+		} else {
+			Reflect.defineMetadata(`${name}:action`,[propKey],target)
+		}
 		desc.enumerable = true
 		desc.configurable = true
 		return desc
@@ -95,11 +111,15 @@ export function Action() {
 export function State<T>(initValue:T) {
 	return function (target:Object, propKey:string) {
 		const name = target.constructor.name
-		let store = getStore(name);
-		if (!store){
-			 create(name,initValue)
+
+		const tempState = {[propKey]:initValue}
+		const states = Reflect.getMetadata(`${name}:state`,target) as Map<string,any>
+		if (states){
+			Object.assign(states,tempState)
+			Reflect.defineMetadata(`${name}:state`,states,target)
+		} else {
+			Reflect.defineMetadata(`${name}:state`,tempState,target)
 		}
-		Reflect.defineMetadata(`${name}:state`,propKey,target)
 	}
 }
 
@@ -110,18 +130,27 @@ export function State<T>(initValue:T) {
 export function useInjection<T extends Object>(Class:any ):T{
 	const className = (Class as Function).prototype.constructor.name
 	const [, setState] = useState({});
-	const stateKey = Reflect.getMetadata(`${className}:state`,Class.prototype) as string
-	let store = getStore(className) as UStore<any>;
-	const res = {[stateKey]:store.state}
+	const res = {}
 	const instance = new Class() as T
-	const keys = Reflect.getMetadata(`${className}:action`,Class.prototype) as Array<string>
-	console.log(Store)
-	keys.forEach((key)=>{
+	const states = Reflect.getMetadata(`${className}:state`,Class.prototype)
+	const actionKeys = Reflect.getMetadata(`${className}:action`,Class.prototype) as Array<string>
+	let store = getStore(className);
+
+	if (!store){
+		store = create(className,states)
+	}
+	store = store as UStore<any>
+
+	Object.assign(res, store.state)
+
+	actionKeys.forEach((key)=>{
 		Object.assign(res,{[key]:instance[key].bind(instance)})
 	})
+
 	useLayoutEffect(() => {
-		emitter.on<T>(className,(data)=>{
-			store.dispatch(data[stateKey])
+		emitter.on<EmitterProps>(className,(data)=>{
+			const {changeKeys,stateMap} = data
+			store?.dispatch(changeKeys,stateMap)
 			setState({})
 		})
 

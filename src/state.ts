@@ -1,36 +1,24 @@
 import {Action, State, useInjection} from "./minState/descStore"
 
 
-class Person {
-	@State(1)
-	id: number | undefined
-
-	@Action()
-	setId(value:number){
-		this.id = value
-	}
-
-	@Action()
-	clear(){
-		this.id = 0
-	}
-}
-
 class Music{
+	@State<string>('李易峰')
+	musicName:string|undefined
 
-	@State<string>('')
-	MusicName:string|undefined
+	@State<string>('jack')
+	singer:string|undefined
 
 	@Action()
-	setName(value:string){
-		this.MusicName = value
+	setName(name:string){
+		this.musicName = name
+	}
+
+	@Action()
+	setSinger(name:string){
+		this.singer = name
 	}
 }
 
-export const usePerson =()=>{
-	return useInjection<Person>(Person)
-}
-
-export const useMusic =()=>{
+export const useMusic = ()=>{
 	return useInjection<Music>(Music)
 }
