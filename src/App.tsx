@@ -7,7 +7,6 @@ import {useMusic, usePerson} from "./funcState";
 const App = ()=> {
   const {name,setName} = usePerson((state => state))
  const {musicName,setMusicName} = useMusic((state => state))
-  console.log(name,'App')
 
   const handleClick = ()=>{
       setName('hello')

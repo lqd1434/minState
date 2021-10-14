@@ -99,7 +99,6 @@ function create<T>({name,value,reducer}:CreateType<T>) {
 	const store = new Store<T>(name, value, reducer);
 
 	$$stores = Object.assign({}, $$stores, {[name]: store});
-	// console.log($$stores)
 	return store;
 }
 
