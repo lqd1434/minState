@@ -1,7 +1,7 @@
 import { useLayoutEffect, useState} from "react";
 import {StoreType} from "./type";
 import 'reflect-metadata'
-import {emitter} from "../EventEmiter";
+import {emitter} from "./utils/EventEmiter";
 
 /**
  * 存储状态的大对象
@@ -10,7 +10,7 @@ let Store:StoreType = {}
 
 interface EmitterProps{
 	changeKeys:string[]
-	stateMap:Map<string,any>
+	stateObj:Object
 }
 
 
@@ -30,11 +30,11 @@ export class UStore<T extends any> {
 	/**
 	 * 更新状态
 	 * @param keys
-	 * @param stateMap
+	 * @param stateObj
 	 */
-	dispatch(keys:string[],stateMap:Map<string,any>){
+	dispatch(keys:string[],stateObj:Object ){
 		keys.forEach((key)=>{
-			this.state[key] = stateMap.get(key)
+			this.state[key] = stateObj[key]
 		})
 	}
 
@@ -66,6 +66,19 @@ function create<T>(name:string,value:T):UStore<T>|null {
 	return store;
 }
 
+function _equal(uniqueName:string,newState:Object):string[] {
+	const {state} = getStore(uniqueName) as UStore<Object>
+	const stateKeys =Object.keys(newState)
+	const changeKeys:string[] = []
+	stateKeys.forEach((key)=>{
+		if (state[key] !== newState[key]){
+			changeKeys.push(key)
+		}
+	})
+	//返回改变的键的map集合
+	return changeKeys
+}
+
 /**
  * 更新函数装饰器,只有通过更新函数才能触发状态更新
  * @constructor
@@ -80,14 +93,17 @@ export function Action() {
 			const keys = Object.keys(this)
 			const result = originFunc.apply(this, args)
 			const changeKeys:string[] = []
-			const stateMap = new Map<string,any>()
+			const stateObj = {}
 			keys.forEach((key)=>{
 				if (this[key]){
 					changeKeys.push(key)
-					stateMap.set(key,this[key])
+					stateObj[key] = this[key]
 				}
 			})
-			emitter.emit<EmitterProps>(name, {changeKeys:changeKeys,stateMap:stateMap})
+			const compareResult = _equal(name,stateObj)
+			if (compareResult.length !== 0){
+				emitter.emit<EmitterProps>(name, {changeKeys:changeKeys,stateObj:stateObj})
+			}
 			return result
 		}
 		//储存
@@ -140,7 +156,6 @@ export function useInjection<T extends Object>(Class:any ):T{
 		store = create(className,states)
 	}
 	store = store as UStore<any>
-
 	Object.assign(res, store.state)
 
 	actionKeys.forEach((key)=>{
@@ -149,8 +164,8 @@ export function useInjection<T extends Object>(Class:any ):T{
 
 	useLayoutEffect(() => {
 		emitter.on<EmitterProps>(className,(data)=>{
-			const {changeKeys,stateMap} = data
-			store?.dispatch(changeKeys,stateMap)
+			const {changeKeys,stateObj} = data
+			store?.dispatch(changeKeys,stateObj)
 			setState({})
 		})
 

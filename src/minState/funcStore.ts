@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {StoreType} from "./type";
 import 'reflect-metadata'
 import {JudgmentType, TypeEnums} from "./utils/judgment";
-import {emitter} from "../EventEmiter";
+import {emitter} from "./utils/EventEmiter";
 
 
 const Store:StoreType = {}
