@@ -1,4 +1,4 @@
-export enum TypeEnums{
+export enum TypeEnums {
 	Num = 'number',
 	Str = 'string',
 	Func = 'function',
@@ -9,18 +9,21 @@ export enum TypeEnums{
 	Mul = 'Null',
 }
 
-export function JudgmentType(targetType:any) {
-	if (!(typeof targetType === 'object')) return (typeof targetType) as string
-	let type:string = ''
+export function JudgmentType(targetType: any) {
+	if (!(typeof targetType === 'object')) return typeof targetType as string
+	let type: string = ''
 	const typeString = Object.prototype.toString.call(targetType)
 
 	switch (typeString) {
 		case '[object Object]':
-			type = 'Object';break
+			type = 'Object'
+			break
 		case '[object Array]':
-			type = 'Array';break
+			type = 'Array'
+			break
 		case '[object Null]':
-			type = 'Null';break
+			type = 'Null'
+			break
 	}
 	return type
 }

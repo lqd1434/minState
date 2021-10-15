@@ -1,29 +1,28 @@
-import { useState, useEffect, Dispatch} from "react";
+import { useState, useEffect, Dispatch } from 'react'
 
-const isFunction = (fn: any) => typeof fn === 'function';
-const isString = (str: any) => typeof str === 'string';
+const isFunction = (fn: any) => typeof fn === 'function'
+const isString = (str: any) => typeof str === 'string'
 
 interface DispatchFuncType<T> {
-	(data:DispatchProps<T>):void
+	(data: DispatchProps<T>): void
 }
 
 interface CreateType<T> {
-	name:string
-	value:T
-	reducer?:(state: T, payload: T) => T;
+	name: string
+	value: T
+	reducer?: (state: T, payload: T) => T
 }
 
-const defaultReducer:CreateType<any>["reducer"] = (state: any, payload: any) => payload;
-
+const defaultReducer: CreateType<any>['reducer'] = (state: any, payload: any) => payload
 
 export interface DispatchProps<T> {
 	newValue: T
-	callback?: (value:T)=>void
+	callback?: (value: T) => void
 }
 
 // define global store
-let $$stores: any = {};
-const $$subscribers: any = {};
+let $$stores: any = {}
+const $$subscribers: any = {}
 
 /**
  * the class to implements store
@@ -37,10 +36,10 @@ class Store<T> {
 	dispatchers: any
 
 	constructor(name: string, state: any, reducer = defaultReducer) {
-		this.name = name;
-		this.state = state;
-		this.reducer = reducer;
-		this.dispatchers = [];
+		this.name = name
+		this.state = state
+		this.reducer = reducer
+		this.dispatchers = []
 		this.dispatch = this.dispatch.bind(this)
 	}
 
@@ -61,18 +60,17 @@ class Store<T> {
 	// 	}
 	// }
 
-
-	dispatch({newValue,callback}:DispatchProps<T>) {
-		const {name, state} = this;
-		this.state = this.reducer(state, newValue);
+	dispatch({ newValue, callback }: DispatchProps<T>) {
+		const { name, state } = this
+		this.state = this.reducer(state, newValue)
 		this.dispatchers.forEach((dispatcher: (arg0: any) => any) => {
 			dispatcher(this.state)
-		});
+		})
 		if ($$subscribers[name].length) {
-			$$subscribers[name].forEach((c: (arg0: any, arg1: any) => any) => c(state, newValue));
+			$$subscribers[name].forEach((c: (arg0: any, arg1: any) => any) => c(state, newValue))
 		}
-		if (callback&&typeof callback === 'function'){
-			 callback(state)
+		if (callback && typeof callback === 'function') {
+			callback(state)
 		}
 	}
 }
@@ -83,36 +81,35 @@ class Store<T> {
  * @returns {Store}
  */
 function getStore(identifier: string) {
-	const name = identifier;
+	const name = identifier
 	if (!$$stores[name]) {
 		return null
 	}
-	return $$stores[name];
+	return $$stores[name]
 }
 
-function create<T>({name,value,reducer}:CreateType<T>) {
+function create<T>({ name, value, reducer }: CreateType<T>) {
 	if ($$stores[name]) {
 		return
 	}
 
-	$$subscribers[name] = [];
-	const store = new Store<T>(name, value, reducer);
+	$$subscribers[name] = []
+	const store = new Store<T>(name, value, reducer)
 
-	$$stores = Object.assign({}, $$stores, {[name]: store});
-	return store;
+	$$stores = Object.assign({}, $$stores, { [name]: store })
+	return store
 }
 
-
-export function createStore<T>({name,value}:Omit<CreateType<T>, "reducer" >):[T,DispatchFuncType<T>]{
-	let store = getStore(name);
-	if (!store){
-		store = create<T>({name,value})
+export function createStore<T>({ name, value }: Omit<CreateType<T>, 'reducer'>): [T, DispatchFuncType<T>] {
+	let store = getStore(name)
+	if (!store) {
+		store = create<T>({ name, value })
 	}
-	const [state, setState] = useState(store.state);
+	const [state, setState] = useState(store.state)
 
 	useEffect(() => {
 		if (!store.dispatchers.includes(setState)) {
-			store.dispatchers.push(setState);
+			store.dispatchers.push(setState)
 		}
 		//组件卸载时取消监听
 		return () => {
@@ -120,6 +117,5 @@ export function createStore<T>({name,value}:Omit<CreateType<T>, "reducer" >):[T,
 		}
 	}, [])
 
-	return [ state, store.dispatch ];
+	return [state, store.dispatch]
 }
-
