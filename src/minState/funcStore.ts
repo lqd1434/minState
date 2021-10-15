@@ -5,7 +5,7 @@ import {JudgmentType, TypeEnums} from "./utils/judgment";
 import {emitter} from "../EventEmiter";
 
 
-let Store:StoreType = {}
+const Store:StoreType = {}
 
 
 /**
@@ -37,7 +37,7 @@ export class UStore<T extends any> {
  * 获取状态
  * @param storeKey 状态命名空间
  */
-function getStore<T>(storeKey: string) {
+function _getStore<T>(storeKey: string) {
 	const name = storeKey;
 	if (!Store[name]) {
 		return  null
@@ -59,6 +59,19 @@ function _create<T>(name:string,value:T):UStore<T>|null {
 	return store;
 }
 
+function _equal(uniqueName:string,newState:Object):string[] {
+	const {state} = _getStore(uniqueName) as UStore<Object>
+	const stateKeys = Object.keys(newState)
+	const changeKeys:string[] = []
+	stateKeys.forEach((key)=>{
+		if (state[key] !== newState[key]){
+			changeKeys.push(key)
+		}
+	})
+	//返回改变的键的map集合
+	return changeKeys
+}
+
 
 type CreateStateType<T> = (set:(state:Partial<T>)=>Partial<T>)=>T
 
@@ -66,7 +79,10 @@ export function create<T extends Object>(createState:CreateStateType<T>) {
 
 	return (getState: (state: T) => T) => {
 		const setFunc = (state: Partial<T>): Partial<T> => {
-			emitter.emit<Partial<T>>(uniqueName, state)
+			const changeKeys = _equal(uniqueName, (state as Object))
+			if (changeKeys.length!==0){
+				emitter.emit<Partial<T>>(uniqueName, state)
+			}
 			return state
 		}
 		const stateObj = createState(setFunc)
@@ -85,11 +101,10 @@ export function create<T extends Object>(createState:CreateStateType<T>) {
 		})
 
 		//获取或者创建store
-		let store = getStore<Object>(uniqueName)
+		let store = _getStore<Object>(uniqueName)
 		if (!store) {
 			store = _create<Object>(uniqueName, state)
 		}
-
 		const [, setState] = useState({})
 		useEffect(() => {
 			emitter.on<Partial<T>>(uniqueName, (data) => {
