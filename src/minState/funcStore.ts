@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {StoreType} from "./type";
+import {CreateStateType, GetStateType, StoreType} from "./type";
 import 'reflect-metadata'
 import {JudgmentType, TypeEnums} from "./utils/judgment";
 import {emitter} from "./utils/EventEmiter";
@@ -73,11 +73,10 @@ function _equal(uniqueName:string,newState:Object):string[] {
 }
 
 
-type CreateStateType<T> = (set:(state:Partial<T>)=>Partial<T>)=>T
 
 export function create<T extends Object>(createState:CreateStateType<T>) {
 
-	return (getState: (state: T) => T) => {
+	return (getState: GetStateType<T>) => {
 		const setFunc = (state: Partial<T>): Partial<T> => {
 			const changeKeys = _equal(uniqueName, (state as Object))
 			if (changeKeys.length!==0){

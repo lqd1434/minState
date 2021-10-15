@@ -1,21 +1,20 @@
-import {UStore} from "../descStore";
-import {DispatchProps} from "../utils/origin";
 
 export interface StoreType{
 	[key:string]:any
 }
 
-export interface DispatchFuncType<T> {
-	(value:T,callback?:(data:any)=>void):void
-}
-export type UpdateFuncProps<T> = {
-	state: T,
-	value: T
-}
-export type UpdateFuncType<T> = (state: T, value: T)=>T
+/**
+ * 函数式写法
+ */
+export type GetStateType<T> = (state: T) => T
+export type CreateStateType<T> = (set:(state:Partial<T>)=>Partial<T>)=>T
 
-export interface CreateType {
-	state:Object
-	action:Object
-}
 
+/**
+ * 装饰器写法
+ */
+
+export interface EmitterProps{
+	changeKeys:string[]
+	stateObj:Object
+}

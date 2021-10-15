@@ -1,4 +1,4 @@
-import {create} from "./minState/funcStore";
+import {create} from "../../src/minState/funcStore";
 
 export const usePerson =create<Person>((set)=>{
 	return {

@@ -1,4 +1,4 @@
-import {Action, State, useInjection} from "./minState/descStore"
+import {Action, State, useInjection} from "../../src/minState/descStore"
 
 
 class Music{

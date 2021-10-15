@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {usePerson} from "./funcState";
+import {usePerson} from "./state/funcState";
 
 const Child = () => {
 	const {name,setName} = usePerson((state => state))

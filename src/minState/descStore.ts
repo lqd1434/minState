@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState} from "react";
-import {StoreType} from "./type";
+import {EmitterProps, StoreType} from "./type";
 import 'reflect-metadata'
 import {emitter} from "./utils/EventEmiter";
 
@@ -8,10 +8,6 @@ import {emitter} from "./utils/EventEmiter";
  */
 let Store:StoreType = {}
 
-interface EmitterProps{
-	changeKeys:string[]
-	stateObj:Object
-}
 
 
 /**

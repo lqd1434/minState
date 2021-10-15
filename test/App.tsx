@@ -1,7 +1,7 @@
 import React from 'react'
 import './App.css'
 import Child from "./Child";
-import {useMusic} from "./state";
+import {useMusic} from "./state/state";
 
 
 const App = ()=> {
