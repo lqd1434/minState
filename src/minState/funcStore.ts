@@ -99,6 +99,7 @@ export function create<T extends Object>(createState: CreateStateType<T>) {
 			store = _create<Object>(uniqueName, state)
 		}
 		const [, setState] = useState({})
+
 		useEffect(() => {
 			emitter.on<Partial<T>>(uniqueName, (data) => {
 				store?.dispatch(data as Object)

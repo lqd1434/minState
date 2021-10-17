@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { EmitterProps, StoreType } from './type'
 import 'reflect-metadata'
 import { emitter } from './utils/EventEmiter'
@@ -137,21 +137,33 @@ export function State<T>(initValue: T) {
  */
 export function useInjection<T extends Object>(Class: any): T {
 	const className = (Class as Function).prototype.constructor.name
+	//缓存值
+	const storeRef = useRef<any>()
+	const statesRef = useRef<Object>()
+	const ResRef = useRef<Object>({})
+	const instanceRef = useRef<T>(new Class() as T)
+	const actionKeysRef = useRef<Array<string>>()
+
 	const [, setState] = useState({})
-	const res = {}
-	const instance = new Class() as T
-	const states = Reflect.getMetadata(`${className}:state`, Class.prototype)
-	const actionKeys = Reflect.getMetadata(`${className}:action`, Class.prototype) as Array<string>
-	let store = getStore(className)
-
-	if (!store) {
-		store = create(className, states)
+	if (!statesRef.current) {
+		statesRef.current = Reflect.getMetadata(`${className}:state`, Class.prototype)
 	}
-	store = store as UStore<any>
-	Object.assign(res, store.state)
+	if (!actionKeysRef.current) {
+		actionKeysRef.current = Reflect.getMetadata(`${className}:action`, Class.prototype) as Array<string>
+	}
+	if (storeRef.current === undefined) {
+		storeRef.current = getStore(className)
+		if (storeRef.current === null) {
+			storeRef.current = create(className, statesRef.current)
+		}
+	}
 
-	actionKeys.forEach((key) => {
-		Object.assign(res, { [key]: instance[key].bind(instance) })
+	const store = storeRef.current as UStore<any>
+
+	Object.assign(ResRef.current, store.state)
+	actionKeysRef.current.forEach((key) => {
+		const instance = instanceRef.current
+		Object.assign(ResRef.current, { [key]: instance[key].bind(instance) })
 	})
 
 	useLayoutEffect(() => {
@@ -161,5 +173,5 @@ export function useInjection<T extends Object>(Class: any): T {
 			setState({})
 		})
 	}, [])
-	return res as T
+	return ResRef.current as T
 }
