@@ -71,7 +71,13 @@ function _equal(uniqueName: string, newState: Object): string[] {
 
 export function create<T extends Object>(createState: CreateStateType<T>) {
 	return (getState: GetStateType<T>) => {
+		//缓存值
 		const storeRef = useRef<any>()
+		const stateRef = useRef<Object>()
+		const actionRef = useRef<Object>()
+		const receiveObjRef = useRef<Object>()
+
+		//缓存set函数
 		const setFunc = useCallback((state: Partial<T>): Partial<T> => {
 			const changeKeys = _equal(uniqueName, state as Object)
 			if (changeKeys.length !== 0) {
@@ -79,31 +85,38 @@ export function create<T extends Object>(createState: CreateStateType<T>) {
 			}
 			return state
 		}, [])
-		const stateObj = createState(setFunc)
 
-		const keys = Object.keys(stateObj)
+		if (!receiveObjRef.current) {
+			receiveObjRef.current = createState(setFunc)
+		}
+		const receivedState = receiveObjRef.current as Object
+		const keys = Object.keys(receivedState)
 		const uniqueName = keys.join('')
-		const state = {}
-		const actions = {}
 
-		keys.forEach((key) => {
-			if (!(JudgmentType(stateObj[key]) === TypeEnums.Func)) {
-				Object.assign(state, { [key]: stateObj[key] })
-			} else {
-				Object.assign(actions, { [key]: stateObj[key] })
-			}
-		})
+		if (!stateRef.current) {
+			stateRef.current = {}
+			actionRef.current = {}
+			keys.forEach((key) => {
+				if (!(JudgmentType(receivedState[key]) === TypeEnums.Func)) {
+					Object.assign(stateRef.current, { [key]: receivedState[key] })
+				} else {
+					Object.assign(actionRef.current, { [key]: receivedState[key] })
+				}
+			})
+		}
 
 		//获取或者创建store
 		if (storeRef.current === undefined) {
 			storeRef.current = _getStore(uniqueName)
 			if (storeRef.current === null) {
-				storeRef.current = _create(uniqueName, state)
+				storeRef.current = _create(uniqueName, stateRef.current)
 			}
 		}
 		const store = storeRef.current
+
 		const [, setState] = useState({})
 
+		//监听set调用,更新组件状态
 		useEffect(() => {
 			emitter.on<Partial<T>>(uniqueName, (data) => {
 				store?.dispatch(data as Object)
@@ -111,7 +124,7 @@ export function create<T extends Object>(createState: CreateStateType<T>) {
 			})
 		}, [])
 
-		const $state = Object.assign({}, store?.state, actions) as T
+		const $state = Object.assign({}, store?.state, actionRef.current) as T
 		return getState($state)
 	}
 }
