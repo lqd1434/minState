@@ -10,6 +10,7 @@ const App = () => {
 		setName('hello')
 	}
 
+	console.log('1,2,3'.split(','))
 	return (
 		<div className="App">
 			<h1>App</h1>

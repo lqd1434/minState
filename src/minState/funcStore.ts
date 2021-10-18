@@ -71,7 +71,6 @@ function _equal(uniqueName: string, newState: Object): string[] {
 
 export function create<T extends Object>(createState: CreateStateType<T>) {
 	return <SliceState>(getState: GetStateType<T, SliceState>) => {
-		console.log(getState)
 		//缓存值
 		const storeRef = useRef<any>()
 		const stateRef = useRef<Object>()

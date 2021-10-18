@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { EmitterProps, StoreType } from './type'
 import 'reflect-metadata'
 import { emitter } from './utils/EventEmiter'
@@ -11,7 +11,7 @@ let Store: StoreType = {}
 /**
  * 状态类
  */
-export class UStore<T extends any> {
+class UStore<T extends any> {
 	storeKey: string
 	state: T
 
