@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { CreateStateType, GetStateType, StoreType } from './type'
 import 'reflect-metadata'
 import { JudgmentType, TypeEnums } from './utils/judgment'
-import { emitter } from './utils/EventEmiter'
+import { useEventEmitter } from './utils/EventEmiter'
 
 const Store: StoreType = {}
 
@@ -76,6 +76,7 @@ export function create<T extends Object>(createState: CreateStateType<T>) {
 		const stateRef = useRef<Object>()
 		const actionRef = useRef<Object>()
 		const receiveObjRef = useRef<Object>()
+		const emitter = useEventEmitter()
 
 		//缓存set函数
 		const setFunc = useCallback((state: Partial<T>): Partial<T> => {
