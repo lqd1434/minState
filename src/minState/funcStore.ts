@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { CreateStateType, GetStateType, StoreType } from './type'
 import 'reflect-metadata'
 import { JudgmentType, TypeEnums } from './utils/judgment'
@@ -71,13 +71,14 @@ function _equal(uniqueName: string, newState: Object): string[] {
 
 export function create<T extends Object>(createState: CreateStateType<T>) {
 	return (getState: GetStateType<T>) => {
-		const setFunc = (state: Partial<T>): Partial<T> => {
+		const storeRef = useRef<any>()
+		const setFunc = useCallback((state: Partial<T>): Partial<T> => {
 			const changeKeys = _equal(uniqueName, state as Object)
 			if (changeKeys.length !== 0) {
 				emitter.emit<Partial<T>>(uniqueName, state)
 			}
 			return state
-		}
+		}, [])
 		const stateObj = createState(setFunc)
 
 		const keys = Object.keys(stateObj)
@@ -94,10 +95,13 @@ export function create<T extends Object>(createState: CreateStateType<T>) {
 		})
 
 		//获取或者创建store
-		let store = _getStore<Object>(uniqueName)
-		if (!store) {
-			store = _create<Object>(uniqueName, state)
+		if (storeRef.current === undefined) {
+			storeRef.current = _getStore(uniqueName)
+			if (storeRef.current === null) {
+				storeRef.current = _create(uniqueName, state)
+			}
 		}
+		const store = storeRef.current
 		const [, setState] = useState({})
 
 		useEffect(() => {

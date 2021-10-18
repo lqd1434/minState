@@ -1,24 +1,23 @@
 import React from 'react'
 import './App.css'
-import Child from "./Child";
-import {useMusic} from "./state/state";
+import Child from './Child'
+import { usePerson } from './state/funcState'
 
+const App = () => {
+	const { name, setName } = usePerson((state) => state)
 
-const App = ()=> {
- const {musicName,setName} = useMusic()
+	const handleClick = () => {
+		setName('hello')
+	}
 
-  const handleClick = ()=>{
-      setName('hello')
-  }
-
-  return (
-    <div className="App">
-      <h1>App</h1>
-      <h1>{musicName}</h1>
-      <button onClick={handleClick}>按钮1</button>
-      <Child/>
-    </div>
-  )
+	return (
+		<div className="App">
+			<h1>App</h1>
+			<h1>{name}</h1>
+			<button onClick={handleClick}>按钮1</button>
+			<Child />
+		</div>
+	)
 }
 
 export default App
