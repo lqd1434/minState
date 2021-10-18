@@ -5,7 +5,7 @@ export interface StoreType {
 /**
  * 函数式写法
  */
-export type GetStateType<T> = (state: T) => T
+export type GetStateType<T, K> = (state: T) => K
 export type CreateStateType<T> = (set: (state: Partial<T>) => Partial<T>) => T
 
 /**
