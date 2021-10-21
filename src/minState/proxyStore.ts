@@ -94,7 +94,14 @@ export function create<T extends Object>(state: T) {
 
 	return () => {
 		const proxyState = new Proxy(state, handler)
+		const uniqueName = Reflect.ownKeys(state).join('')
 
+		let store = _getStore(uniqueName)
+		if (!store) {
+			store = _create(uniqueName, proxyState)
+		}
+		store = store as UStore<any>
+		console.log(Store)
 		const [, setState] = useState({})
 		useEffect(() => {
 			emitter.on<any>('set', (state) => {
@@ -102,6 +109,6 @@ export function create<T extends Object>(state: T) {
 				setState({})
 			})
 		}, [])
-		return proxyState
+		return store.state as T
 	}
 }
