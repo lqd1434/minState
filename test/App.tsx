@@ -1,26 +1,23 @@
 import React from 'react'
 import './App.css'
 import Child from './Child'
-import { usePerson } from './state/funcState'
-import '../src/desc/test'
-import { FutureBuild } from './FutureBuild'
+import './state/proxyState'
+import { usePerson } from './state/proxyState'
 
 const App = () => {
-	const { name, setName } = usePerson((state) => state)
+	const person = usePerson()
 
 	const handleClick = () => {
-		setName('hello')
+		person.name = 'jackkk'
 	}
 
 	return (
-		<FutureBuild>
-			<div className="App">
-				<h1>App</h1>
-				<h1>{name}</h1>
-				<button onClick={handleClick}>按钮1</button>
-				<Child />
-			</div>
-		</FutureBuild>
+		<div className="App">
+			<h1>App</h1>
+			<h1>{person.name}</h1>
+			<button onClick={handleClick}>按钮1</button>
+			<Child />
+		</div>
 	)
 }
 

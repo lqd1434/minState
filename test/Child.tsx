@@ -1,14 +1,15 @@
-import React, {useEffect} from "react";
-import {usePerson} from "./state/funcState";
+import React, { useEffect } from 'react'
+import { usePerson } from './state/proxyState'
 
 const Child = () => {
-	const {name,setName} = usePerson((state => state))
+	const person = usePerson()
+	console.log('Child')
 	return (
-			<div className="App">
-				<h1>Child</h1>
-				<h1>{name}</h1>
-				<button onClick={()=>{}}>按钮1</button>
-			</div>
+		<div className="App">
+			<h1>Child</h1>
+			<h1>{person.name}</h1>
+			<button onClick={() => {}}>按钮1</button>
+		</div>
 	)
 }
 
