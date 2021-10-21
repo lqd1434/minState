@@ -19,7 +19,7 @@ class Shuriken implements ThrowableWeapon {
 }
 
 @injectable()
-class Ninja implements Warrior {
+class Ninja {
 	@inject(TYPES.Weapon) private _katana: Weapon
 	@inject(TYPES.ThrowableWeapon) private _shuriken: ThrowableWeapon
 	public fight() {
