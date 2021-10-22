@@ -15,17 +15,6 @@ export class UStore<T extends any> {
 	constructor(storeKey: string, state: T) {
 		this.storeKey = storeKey
 		this.state = state
-		this.dispatch = this.dispatch.bind(this)
-	}
-
-	/**
-	 * 状态更新函数
-	 * @param state 更新值
-	 */
-	dispatch(state: Object) {
-		Object.keys(state).forEach((key) => {
-			this.state[key] = state[key]
-		})
 	}
 }
 
@@ -55,17 +44,9 @@ function _create<T>(name: string, value: T): UStore<T> | null {
 	return store
 }
 
-function _equal(uniqueName: string, newState: Object): string[] {
+function _equal(uniqueName: string, key: string, value: any): boolean {
 	const { state } = _getStore(uniqueName) as UStore<Object>
-	const stateKeys = Object.keys(newState)
-	const changeKeys: string[] = []
-	stateKeys.forEach((key) => {
-		if (state[key] !== newState[key]) {
-			changeKeys.push(key)
-		}
-	})
-	//返回改变的键的map集合
-	return changeKeys
+	return state[key] !== value //不同返回true,需要render
 }
 
 export function create<T extends Object>(state: T) {
@@ -86,18 +67,26 @@ export function create<T extends Object>(state: T) {
 		 * @param proxy 第三个是代理对象
 		 */
 		set(targetObj, key, value, proxy) {
-			emitter.emit<null>('update', null)
-			return Reflect.set(targetObj, key, value, proxy)
+			const uniqueName = Reflect.ownKeys(targetObj).join('')
+			const needRender = _equal(uniqueName, key, value)
+			let res = true
+			if (needRender) {
+				res = Reflect.set(targetObj, key, value, proxy)
+				emitter.emit<null>('update', null)
+			}
+			return res
 		},
 	}
 
 	return <SliceState>(getState: GetStateType<T, SliceState>) => {
 		const proxyStateRef = useRef<Object>()
 		const storeRef = useRef<UStore<any>>()
+
 		if (!proxyStateRef.current) {
 			proxyStateRef.current = new Proxy(state, handler)
 		}
 		const uniqueName = Reflect.ownKeys(state).join('')
+
 		if (storeRef.current === undefined) {
 			storeRef.current = _getStore(uniqueName)
 			if (storeRef.current === null) {
