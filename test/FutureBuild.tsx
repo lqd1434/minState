@@ -6,8 +6,7 @@ interface FutureBuildProps {
 }
 
 export const FutureBuild: React.FC<FutureBuildProps> = ({ children }) => {
-	console.log(children)
-	const person = usePerson()
+	const person = usePerson((state) => state)
 	console.log(person, 'FutureBuild')
 	return (
 		<div>

@@ -91,7 +91,7 @@ export function create<T extends Object>(state: T) {
 		},
 	}
 
-	return () => {
+	return <SliceState>(getState: GetStateType<T, SliceState>) => {
 		const proxyStateRef = useRef<Object>()
 		const storeRef = useRef<UStore<any>>()
 		if (!proxyStateRef.current) {
@@ -115,6 +115,6 @@ export function create<T extends Object>(state: T) {
 			})
 		}, [])
 
-		return store.state as T
+		return getState(store.state as T)
 	}
 }

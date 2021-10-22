@@ -7,7 +7,7 @@ import { Route, Switch, useHistory } from 'react-router-dom'
 import { FutureBuild } from './FutureBuild'
 
 const App = () => {
-	const person = usePerson()
+	const person = usePerson((state) => state)
 	const history = useHistory()
 
 	const handleClick = () => {

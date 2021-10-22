@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { usePerson } from './state/proxyState'
 
 const Child = () => {
-	const person = usePerson()
+	const person = usePerson((state) => state)
 	console.log('Child')
 	return (
 		<div className="App">
