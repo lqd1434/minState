@@ -1,6 +1,6 @@
 import { CreateStateType, GetStateType, StoreType } from './type'
 import 'reflect-metadata'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { emitter } from './utils/EventEmiter'
 
 const Store: StoreType = {}
@@ -86,29 +86,35 @@ export function create<T extends Object>(state: T) {
 		 * @param proxy 第三个是代理对象
 		 */
 		set(targetObj, key, value, proxy) {
-			emitter.emit<any>('set', { key, value })
-			targetObj[key] = value
+			emitter.emit<null>('update', null)
 			return Reflect.set(targetObj, key, value, proxy)
 		},
 	}
 
 	return () => {
-		const proxyState = new Proxy(state, handler)
-		const uniqueName = Reflect.ownKeys(state).join('')
-
-		let store = _getStore(uniqueName)
-		if (!store) {
-			store = _create(uniqueName, proxyState)
+		const proxyStateRef = useRef<Object>()
+		const storeRef = useRef<UStore<any>>()
+		if (!proxyStateRef.current) {
+			proxyStateRef.current = new Proxy(state, handler)
 		}
-		store = store as UStore<any>
-		console.log(Store)
+		const uniqueName = Reflect.ownKeys(state).join('')
+		if (storeRef.current === undefined) {
+			storeRef.current = _getStore(uniqueName)
+			if (storeRef.current === null) {
+				storeRef.current = _create(uniqueName, proxyStateRef.current)
+			}
+		}
+
+		const store = storeRef.current as UStore<any>
+
 		const [, setState] = useState({})
+
 		useEffect(() => {
-			emitter.on<any>('set', (state) => {
-				console.log(state, 'emitter')
+			emitter.on<null>('update', () => {
 				setState({})
 			})
 		}, [])
+
 		return store.state as T
 	}
 }
